@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>App Interface</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+        }
+
+        #passwordForm input[type="password"], #passwordForm button {
+            width: 200px;
+            height: 40px;
+            margin-top: 10px;
+            border: 2px solid #007BFF; /* Blue border color */
+            background-color: #E3F2FD; /* Light blue background */
+            border-radius: 5px;
+            padding: 10px;
+            font-size: 16px;
+            color: #007BFF; /* Blue text color */
+        }
+
+        #passwordForm button {
+            cursor: pointer;
+            background-color: #007BFF; /* Darker blue background for button */
+            color: white; /* White text for better contrast */
+            border: none; /* No border for the button */
+        }
+
+        #passwordForm button:hover {
+            background-color: #0056b3; /* Even darker blue on hover */
+        }
+    </style>
+</head>
+<body>
+    <h1>Welcome To The Alco Ticket System</h1>
+    <br>
+    <div id="passwordForm">
+        <h2>Please enter the password</h3>
+        <input type="password" id="passwordInput" placeholder="Enter password">
+        <br>
+		<button onclick="validatePassword()">Submit</button>
+    </div>
+    <div id="app" style="display:none;"></div> <!-- Placeholder for dynamic content -->
+
+    <script>
+        function validatePassword() {
+            const password = document.getElementById('passwordInput').value;
+            fetch('/validate_password', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({password: password})
+            })
+            .then(response => {
+                if (response.ok) {
+                    return response.json();
+                } else {
+                    throw new Error('Invalid password');
+                }
+            })
+            .then(data => {
+                if (data.valid) {
+                    fetchProtectedContent();
+                } else {
+                    alert('Invalid password');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        }
+
+        function fetchProtectedContent() {
+            fetch('/get_html_content').then(function(response) {
+                return response.json();
+            }).then(function(data) {
+                const container = document.getElementById('app');
+                container.style.display = 'block';
+                container.innerHTML = data.html_content;  // Insert HTML content into the DOM
+                document.getElementById('passwordForm').style.display = 'none';  // Hide the password form
+                executeScripts(container);
+            }).catch(function(error) {
+                console.error('Failed to load page content:', error);
+            });
+        }
+
+        function executeScripts(container) {
+            const scripts = Array.from(container.getElementsByTagName('script'));
+            for (let script of scripts) {
+                const newScript = document.createElement('script');
+                if (script.type === 'module') {
+                    newScript.type = 'module';
+                }
+                newScript.text = script.text;
+                script.parentNode.replaceChild(newScript, script);
+            }
+        }
+    </script>
+</body>
+</html>
