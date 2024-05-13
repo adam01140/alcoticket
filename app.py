@@ -89,7 +89,7 @@ def get_html_content():
     
     
     
-  <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -272,11 +272,13 @@ button {
 <h2>Pending Tickets</h2>
 
 <select id="sortFilter" onchange="loadTickets()">
-        <option value="all">Sort By Person</option>
-        <option value="Adnen">Adnen</option>
-        <option value="David">David</option>
-        <option value="Octavio">Octavio</option>
-    </select><br>
+    <option value="all">All</option> <!-- Ensure this is present -->
+    <option value="Adnen">Adnen</option>
+    <option value="David">David</option>
+    <option value="Octavio">Octavio</option>
+</select>
+
+<br>
 	<br>
 	
 <div id="pendingTicketsList" class="tickets-container">
@@ -414,7 +416,7 @@ function updateMemberDropdowns(members) {
     const assignSelects = document.querySelectorAll('[id^="assign-"]');
 
     memberSelect.innerHTML = '';
-    sortFilter.innerHTML = '<option value="all">Sort By Person</option>';
+    sortFilter.innerHTML = '<option value="all">All Tickets</option>';
 
     members.forEach(member => {
         const option = document.createElement('option');
@@ -469,7 +471,7 @@ function getAssignmentControl(docId, status) {
 
 function updateSortFilter(members) {
     const sortFilter = document.getElementById('sortFilter');
-    sortFilter.innerHTML = '<option value="all">Sort By Person</option>';
+    sortFilter.innerHTML = '<option value="all">All Tickets</option>';
     members.forEach(member => {
         const option = document.createElement('option');
         option.value = member;
