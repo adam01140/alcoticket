@@ -3,6 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <title>Alco Ticketing System</title>
+	
+	
+
+
    <style>
    
    
@@ -50,20 +54,20 @@ button {
 
 
    .tickets-container {
-        display: block;              /* Enable Flexbox */
-        justify-content: space-around; /* Distribute space evenly around the items */
+        display: flex;              /* Enable Flexbox */
+        flex-wrap: wrap;            /* Allow items to wrap onto the next line */
+        justify-content: center; /* Distribute space evenly around the items */
         width: 100%;                /* Take full width of the container */
     }
-	
-	
+    
     .ticket-item {
         border: 4px solid lightblue; /* Set the border color */
         border-radius: 10px;        /* Rounded corners */
         padding: 20px;              /* Some padding inside the border */
         margin: 10px;               /* Margin outside the border */
         background-color: #ffffff;  /* Light blue background */
-        width: 50%;               /* Fixed width */
-        height: auto;               /* Automatic height */
+        width: calc(45% - 20px);    /* Calculate width, subtracting margins */
+        box-sizing: border-box;     /* Include padding and border in the element's total width */
     }
 	
 	
@@ -74,7 +78,7 @@ button {
         margin: 10px;               /* Margin outside the border */
         background-color: #ffffff;  /* Light blue background */
         width: 80%;               /* Fixed width */
-        height: 100%               /* Automatic height adjustment */
+        height: 10%               /* Automatic height adjustment */
     }
 
     #tickets {
@@ -138,14 +142,34 @@ button {
         <button onclick="submitTicket()">Submit Ticket</button>
     </div>
 
-    <!-- Display Tickets -->
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 	
 	 <div class="tickets-container">
 	 
 	<div id = "tickets">
+	<h2>Open Tickets</h2>
 	
-	<div id="openTicketsList">
-    <h2>Open Tickets</h2>
+	<div id="openTicketsList" class="tickets-container">
+    
 </div>
 
 </div>
@@ -164,7 +188,7 @@ button {
     </select><br>
 	<br>
 	
-<div id="pendingTicketsList">
+<div id="pendingTicketsList" class="tickets-container">
     
 </div>
 
@@ -336,10 +360,10 @@ function getAssignmentControl(docId, status) {
                     <option value=''>Assign Ticket</option>
                     ${optionsHTML}
                 </select>
-                <br><button onclick='deleteTicket("${docId}")'>Delete</button> <button onclick='assignTicket("${docId}")'>Save</button>`;
+                <br><button onclick='deleteTicket("${docId}")'>Delete</button> <button onclick='assignTicket("${docId}")'>Save</button> <br><br>`;
     } else {
         return `<button onclick='unassignTicket("${docId}")'>Unassign</button>
-                <button onclick='deleteTicket("${docId}")'>Delete</button>`;
+                <button onclick='deleteTicket("${docId}")'>Delete</button><br><br>`;
     }
 }
 
@@ -376,7 +400,7 @@ window.loadTickets = async () => {
     const filter = document.getElementById('sortFilter').value;
 
     // Clear the existing content
-    openTicketsList.innerHTML = '<h2>Open Tickets</h2>';
+    openTicketsList.innerHTML = '<h2></h2>';
     pendingTicketsList.innerHTML = '<h2></h2>';
 
     const querySnapshot = await getDocs(collection(db, "tickets"));
