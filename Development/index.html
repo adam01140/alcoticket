@@ -220,7 +220,7 @@ button {
 
     <script type="module">
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js';
-        import { getFirestore, doc, setDoc, getDoc, collection, getDocs, addDoc, updateDoc, deleteDoc } from 'https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore.js';
+import { getFirestore, doc, setDoc, getDoc, collection, getDocs, addDoc, updateDoc, deleteDoc, query, where } from 'https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore.js';
 
         const firebaseConfig = {
             apiKey: "AIzaSyDgqB5FaU1Zreq3H5WwfDo7WSUEkVOdKxU",
@@ -267,7 +267,6 @@ window.deleteMember = async () => {
     if (selectedMember) {
         // Confirm before deleting
         if (confirm(`Are you sure you want to delete ${selectedMember}?`)) {
-            // Find the document ID of the member in Firestore
             const membersRef = collection(db, "members");
             const q = query(membersRef, where("name", "==", selectedMember));
             const querySnapshot = await getDocs(q);
@@ -283,6 +282,7 @@ window.deleteMember = async () => {
         alert("Please select a member to delete.");
     }
 };
+
 
 
 
@@ -320,6 +320,7 @@ window.addMember = async () => {
     if (newMemberName) {
         // Add the new member to Firestore
         await addDoc(collection(db, "members"), { name: newMemberName });
+		alert("New member added!");
         loadMembers(); // Reload members from Firestore
     }
 };
