@@ -94,23 +94,71 @@ def get_html_content():
 <head>
     <meta charset="UTF-8">
     <title>Alco Ticketing System</title>
+	
+	
+
+
    <style>
    
-   .tickets-container {
-        display: block;              /* Enable Flexbox */
-        justify-content: space-around; /* Distribute space evenly around the items */
-        width: 100%;                /* Take full width of the container */
+   
+  #memberManagement {
+    display: block;
+    justify-content: center;
+    margin-bottom: 20px;
+	 border: 4px solid lightblue; /* Set the border color */
+        border-radius: 10px;        /* Rounded corners */
+        padding: 20px;              /* Some padding inside the border */
+        margin: 10px;               /* Margin outside the border */
+        background-color: #ffffff;  /* Light blue background */
+        width: 80%;               /* Fixed width */
+        height: 100% 
+}
+
+#memberList{
+    display: flex;
+    align-items: center;
+    justify-content: center; /* Centers the content horizontally */
+}
+
+#memberList {
+    margin-right: 10px;
+	
+}
+
+#insidemembers {
+        border: 4px solid lightblue; /* Set the border color */
+        border-radius: 10px;        /* Rounded corners */
+        padding: 20px;              /* Some padding inside the border */
+        margin: 10px;               /* Margin outside the border */
+        background-color: #ffffff;  /* Light blue background */
+        width: 80%;               /* Fixed width */
+        height: 100%               /* Automatic height adjustment */
     }
 	
 	
+
+button {
+    margin-left: 10px; /* Ensure consistent spacing between buttons */
+}
+
+
+
+
+   .tickets-container {
+        display: flex;              /* Enable Flexbox */
+        flex-wrap: wrap;            /* Allow items to wrap onto the next line */
+        justify-content: center; /* Distribute space evenly around the items */
+        width: 100%;                /* Take full width of the container */
+    }
+    
     .ticket-item {
         border: 4px solid lightblue; /* Set the border color */
         border-radius: 10px;        /* Rounded corners */
         padding: 20px;              /* Some padding inside the border */
         margin: 10px;               /* Margin outside the border */
         background-color: #ffffff;  /* Light blue background */
-        width: 50%;               /* Fixed width */
-        height: auto;               /* Automatic height */
+        width: calc(45% - 20px);    /* Calculate width, subtracting margins */
+        box-sizing: border-box;     /* Include padding and border in the element's total width */
     }
 	
 	
@@ -121,7 +169,7 @@ def get_html_content():
         margin: 10px;               /* Margin outside the border */
         background-color: #ffffff;  /* Light blue background */
         width: 80%;               /* Fixed width */
-        height: 100%               /* Automatic height adjustment */
+        height: 10%               /* Automatic height adjustment */
     }
 
     #tickets {
@@ -130,7 +178,7 @@ def get_html_content():
         padding: 20px;              /* Some padding inside the border */
         margin: 10px;               /* Margin outside the border */
         background-color: #ffffff;  /* Light blue background */
-        width: 600px;               /* Fixed width */
+        width: 80%;               /* Fixed width */
         height: 100%               /* Automatic height adjustment */
     }
 
@@ -153,6 +201,7 @@ def get_html_content():
         background-color: #64adc4;
         color: #fff;
         border: none;
+		height: 40px;
         border-radius: 5px;
         padding: 10px 20px;
         margin-top: 10px;
@@ -184,14 +233,34 @@ def get_html_content():
         <button onclick="submitTicket()">Submit Ticket</button>
     </div>
 
-    <!-- Display Tickets -->
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 	
 	 <div class="tickets-container">
 	 
 	<div id = "tickets">
+	<h2>Open Tickets</h2>
 	
-	<div id="openTicketsList">
-    <h2>Open Tickets</h2>
+	<div id="openTicketsList" class="tickets-container">
+    
 </div>
 
 </div>
@@ -203,18 +272,61 @@ def get_html_content():
 <h2>Pending Tickets</h2>
 
 <select id="sortFilter" onchange="loadTickets()">
-        <option value="all">All</option>
+        <option value="all">Sort By Person</option>
         <option value="Adnen">Adnen</option>
         <option value="David">David</option>
         <option value="Octavio">Octavio</option>
     </select><br>
 	<br>
 	
-<div id="pendingTicketsList">
+<div id="pendingTicketsList" class="tickets-container">
     
 </div>
-	
+
+
 </div>
+
+
+<div id="memberManagement">
+    <h2>Manage Members</h2>
+	<br>
+	
+	
+	<div id = "insidemembers">
+	<button onclick="addMember()">Add New Member</button>
+	
+	
+	
+	<br>
+    
+        <div id="memberList">
+		
+		
+		
+            <select id="memberSelect">
+                <option value="Adnen">Adnen</option>
+                <option value="David">David</option>
+                <option value="Octavio">Octavio</option>
+            </select>
+        
+        
+        <button onclick="deleteMember()">Delete Member</button>
+		
+		</div>
+		
+    </div>
+	
+	
+	
+
+</div>
+
+
+
+
+
+	
+
 
 
 
@@ -223,7 +335,7 @@ def get_html_content():
 
     <script type="module">
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js';
-        import { getFirestore, doc, setDoc, getDoc, collection, getDocs, addDoc, updateDoc, deleteDoc } from 'https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore.js';
+import { getFirestore, doc, setDoc, getDoc, collection, getDocs, addDoc, updateDoc, deleteDoc, query, where } from 'https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore.js';
 
         const firebaseConfig = {
             apiKey: "AIzaSyDgqB5FaU1Zreq3H5WwfDo7WSUEkVOdKxU",
@@ -258,6 +370,120 @@ def get_html_content():
         loadTickets();  // Reload tickets after submission
     }
 };
+
+
+
+
+
+window.deleteMember = async () => {
+    const memberSelect = document.getElementById('memberSelect');
+    const selectedMember = memberSelect.value;
+
+    if (selectedMember) {
+        // Confirm before deleting
+        if (confirm(`Are you sure you want to delete ${selectedMember}?`)) {
+            const membersRef = collection(db, "members");
+            const q = query(membersRef, where("name", "==", selectedMember));
+            const querySnapshot = await getDocs(q);
+            querySnapshot.forEach(async (doc) => {
+                await deleteDoc(doc.ref); // Delete the document
+            });
+
+            // Reload members to update UI
+            loadMembers();
+            alert(`${selectedMember} has been deleted.`);
+        }
+    } else {
+        alert("Please select a member to delete.");
+    }
+};
+
+
+
+
+window.loadMembers = async () => {
+    const membersRef = collection(db, "members");
+    const memberSnapshot = await getDocs(membersRef);
+    const members = memberSnapshot.docs.map(doc => doc.data().name);
+    updateMemberDropdowns(members);
+};
+
+function updateMemberDropdowns(members) {
+    const memberSelect = document.getElementById('memberSelect');
+    const sortFilter = document.getElementById('sortFilter');
+    const assignSelects = document.querySelectorAll('[id^="assign-"]');
+
+    memberSelect.innerHTML = '';
+    sortFilter.innerHTML = '<option value="all">Sort By Person</option>';
+
+    members.forEach(member => {
+        const option = document.createElement('option');
+        option.value = member;
+        option.text = member;
+
+        memberSelect.appendChild(option.cloneNode(true));
+        sortFilter.appendChild(option.cloneNode(true));
+
+        assignSelects.forEach(select => {
+            select.appendChild(option.cloneNode(true));
+        });
+    });
+}
+
+window.addMember = async () => {
+    let newMemberName = prompt("Enter the name of the new member:");
+    if (newMemberName) {
+        // Add the new member to Firestore
+        await addDoc(collection(db, "members"), { name: newMemberName });
+		alert("New member added!");
+        loadMembers(); // Reload members from Firestore
+    }
+};
+
+
+
+function getAssignmentControl(docId, status) {
+    let members = Array.from(document.getElementById('memberSelect').options).map(option => option.value);
+    let optionsHTML = members.map(member => `<option value='${member}'>${member}</option>`).join('');
+
+    if (status === "New") {
+        return `<select id='assign-${docId}'>
+                    <option value=''>Assign Ticket</option>
+                    ${optionsHTML}
+                </select>
+                <br><button onclick='deleteTicket("${docId}")'>Delete</button> <button onclick='assignTicket("${docId}")'>Save</button> <br><br>`;
+    } else {
+        return `<button onclick='unassignTicket("${docId}")'>Unassign</button>
+                <button onclick='deleteTicket("${docId}")'>Delete</button><br><br>`;
+    }
+}
+
+
+
+
+
+
+
+
+
+
+function updateSortFilter(members) {
+    const sortFilter = document.getElementById('sortFilter');
+    sortFilter.innerHTML = '<option value="all">Sort By Person</option>';
+    members.forEach(member => {
+        const option = document.createElement('option');
+        option.value = member;
+        option.text = member;
+        sortFilter.appendChild(option);
+    });
+}
+
+
+
+
+
+
+
 window.loadTickets = async () => {
     console.log("Loading tickets...");
     const openTicketsList = document.getElementById('openTicketsList');
@@ -265,26 +491,41 @@ window.loadTickets = async () => {
     const filter = document.getElementById('sortFilter').value;
 
     // Clear the existing content
-    openTicketsList.innerHTML = '<h2>Open Tickets</h2>';
-    pendingTicketsList.innerHTML = '';
+    openTicketsList.innerHTML = '<h2></h2>';
+    pendingTicketsList.innerHTML = '<h2></h2>';
 
     const querySnapshot = await getDocs(collection(db, "tickets"));
     console.log(`Number of tickets fetched: ${querySnapshot.size}`);
 
+    let tickets = [];
     querySnapshot.forEach((doc) => {
-        const ticket = doc.data();
-        console.log(`Processing ticket: ${doc.id}`, ticket);
+        let ticket = { id: doc.id, ...doc.data() };
+        tickets.push(ticket);
+    });
+
+    // Priority mapping
+    const priorityMap = { 'High': 3, 'Medium': 2, 'Low': 1 };
+
+    // Sort tickets by priority
+    tickets.sort((a, b) => priorityMap[b.priority] - priorityMap[a.priority]);
+
+    tickets.forEach((ticket) => {
+        console.log(`Processing ticket: ${ticket.id}`, ticket);
+
+        // Format the creation date
+        const createdAt = ticket.created.toDate(); // Convert timestamp to Date object
+        const formattedDate = createdAt.toLocaleDateString("en-US", { year: 'numeric', month: 'long', day: 'numeric' });
 
         let ticketHTML = `<div class='ticket-item' style='display: block;'>
             <h2>${ticket.title}</h2>
             <b>From:</b> ${ticket.requestor}
-            <p>${ticket.priority} Priority</p>
+            <p>${ticket.priority} Priority - Created: ${formattedDate}</p>
             <p>${ticket.status}</p>
             <div id='ticketsinside'>
                 ${ticket.description}
             </div>
             <br>
-            ${getAssignmentControl(doc.id, ticket.status)}
+            ${getAssignmentControl(ticket.id, ticket.status)}
         </div>`;
 
         // Check if the ticket is New, it should always be visible in open tickets
@@ -298,22 +539,10 @@ window.loadTickets = async () => {
             }
         }
     });
+	//const querySnapshot = await getDocs(collection(db, "tickets"));
+	let members = Array.from(document.getElementById('memberSelect').options).map(option => option.value);
+    updateSortFilter(members);
 };
-
-function getAssignmentControl(docId, status) {
-    if (status === "New") {
-        return `<select id='assign-${docId}'>
-                    <option value=''>Assign Ticket</option>
-                    <option value='Adnen'>Adnen</option>
-                    <option value='David'>David</option>
-                    <option value='Octavio'>Octavio</option>
-                </select>
-                <br><button onclick='deleteTicket("${docId}")'>Delete</button> <button onclick='assignTicket("${docId}")'>Save</button>`;
-    } else {
-        return `<button onclick='unassignTicket("${docId}")'>Unassign</button>
-                <button onclick='deleteTicket("${docId}")'>Delete</button>`;
-    }
-}
 
 
 
@@ -349,12 +578,24 @@ function getAssignmentControl(docId, status) {
             }
         };
 
-        window.onload = () => {
-            loadTickets(); // Load tickets when the page loads
-            //alert("hey");
-        };
         
-        loadTickets();
+window.onload = async () => {
+    await loadTickets(); // Load tickets when the page loads
+    await loadMembers(); // Load members from Firestore
+};
+
+
+
+		// Ensure that onload setup is in place
+window.onload = () => {
+loadMembers();
+    loadTickets(); // Initial load of tickets
+    let members = Array.from(document.getElementById('memberSelect').options).map(option => option.value);
+    updateSortFilter(members); // Setup sort filters with initial members
+};
+
+
+        //loadTickets();
         
         
     </script>
