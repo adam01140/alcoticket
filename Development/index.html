@@ -181,9 +181,20 @@ window.loadTickets = async () => {
     const querySnapshot = await getDocs(collection(db, "tickets"));
     console.log(`Number of tickets fetched: ${querySnapshot.size}`);
 
+    let tickets = [];
     querySnapshot.forEach((doc) => {
-        const ticket = doc.data();
-        console.log(`Processing ticket: ${doc.id}`, ticket);
+        let ticket = { id: doc.id, ...doc.data() };
+        tickets.push(ticket);
+    });
+
+    // Priority mapping
+    const priorityMap = { 'High': 3, 'Medium': 2, 'Low': 1 };
+
+    // Sort tickets by priority
+    tickets.sort((a, b) => priorityMap[b.priority] - priorityMap[a.priority]);
+
+    tickets.forEach((ticket) => {
+        console.log(`Processing ticket: ${ticket.id}`, ticket);
 
         // Format the creation date
         const createdAt = ticket.created.toDate(); // Convert timestamp to Date object
@@ -192,14 +203,13 @@ window.loadTickets = async () => {
         let ticketHTML = `<div class='ticket-item' style='display: block;'>
             <h2>${ticket.title}</h2>
             <b>From:</b> ${ticket.requestor}
-            <p>${ticket.priority} Priority</p>
-            <p>Created: ${formattedDate}</p>
+            <p>${ticket.priority} Priority - Created: ${formattedDate}</p>
             <p>${ticket.status}</p>
             <div id='ticketsinside'>
                 ${ticket.description}
             </div>
             <br>
-            ${getAssignmentControl(doc.id, ticket.status)}
+            ${getAssignmentControl(ticket.id, ticket.status)}
         </div>`;
 
         // Check if the ticket is New, it should always be visible in open tickets
@@ -215,7 +225,6 @@ window.loadTickets = async () => {
     });
 };
 
-
 function getAssignmentControl(docId, status) {
     if (status === "New") {
         return `<select id='assign-${docId}'>
@@ -230,8 +239,6 @@ function getAssignmentControl(docId, status) {
                 <button onclick='deleteTicket("${docId}")'>Delete</button>`;
     }
 }
-
-
 
 
         window.assignTicket = async (docId) => {
