@@ -97,6 +97,8 @@ button {
         width: 80%;               /* Fixed width */
         height: 10%               /* Automatic height adjustment */
     }
+	
+	
 
     #tickets {
         border: 4px solid lightblue; /* Set the border color */
@@ -147,7 +149,10 @@ button {
 <center>
     <!-- Ticket Submission Form -->
     <div id = "tickets">
-        <h2>Submit a Ticket</h2>
+        <h2><u>Submit a Ticket</u></h2>
+		
+		
+		<div id="ticketsinside">
         <input type="text" id="ticketTitle" placeholder="Ticket Issue"><br>
         <input type="text" id="ticketName" placeholder="Requester"><br>
         <textarea id="ticketDesc" placeholder="Description"></textarea><br>
@@ -158,6 +163,7 @@ button {
         </select><br>
         <button onclick="submitTicket()">Submit Ticket</button>
     </div>
+	</div>
 
 
 
@@ -183,7 +189,7 @@ button {
 	 <div class="tickets-container">
 	 
 	<div id = "tickets">
-	<h2>Open Tickets</h2>
+	<h2><u>Open Tickets</u></h2>
 	
 	<div id="openTicketsList" class="tickets-container">
     
@@ -195,7 +201,7 @@ button {
 <div id = "tickets">
 <!-- Pending Tickets -->
 
-<h2>Pending Tickets</h2>
+<h2><u>Pending Tickets</u></h2>
 
 <select id="sortFilter" onchange="loadTickets()">
     <option value="all">All</option> <!-- Ensure this is present -->
