@@ -10,6 +10,23 @@
    <style>
    
    
+   
+   
+   
+   #deletedTicketsContainer {
+    display: block;
+    justify-content: center;
+    margin-bottom: 20px;
+	 border: 4px solid lightblue; /* Set the border color */
+        border-radius: 10px;        /* Rounded corners */
+        padding: 20px;              /* Some padding inside the border */
+        margin: 10px;               /* Margin outside the border */
+        background-color: #ffffff;  /* Light blue background */
+        width: 80%;               /* Fixed width */
+        height: 100% 
+}
+   
+   
   #memberManagement {
     display: block;
     justify-content: center;
@@ -234,6 +251,10 @@ button {
 
 
 
+<div id="deletedTicketsContainer">
+    <h2>Recently Deleted Tickets</h2>
+    <div id="deletedTicketsList" class="tickets-container"></div>
+</div>
 
 
 	
@@ -282,6 +303,34 @@ import { getFirestore, doc, setDoc, getDoc, collection, getDocs, addDoc, updateD
     }
 };
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+window.deleteTicket = async (docId) => {
+    if (confirm("Are you sure you want to mark this ticket as deleted?")) {
+        const ticketRef = doc(db, "tickets", docId);
+        await updateDoc(ticketRef, {
+            status: "Recently Deleted"
+        });
+        console.log("Ticket marked as recently deleted!");
+        loadTickets();  // Reload tickets to update display
+    }
+};
 
 
 
@@ -399,61 +448,44 @@ window.loadTickets = async () => {
     console.log("Loading tickets...");
     const openTicketsList = document.getElementById('openTicketsList');
     const pendingTicketsList = document.getElementById('pendingTicketsList');
+    const deletedTicketsList = document.getElementById('deletedTicketsList');
     const filter = document.getElementById('sortFilter').value;
 
     // Clear the existing content
     openTicketsList.innerHTML = '<h2></h2>';
     pendingTicketsList.innerHTML = '<h2></h2>';
+    deletedTicketsList.innerHTML = '';  // Clear the deleted tickets list
 
     const querySnapshot = await getDocs(collection(db, "tickets"));
     console.log(`Number of tickets fetched: ${querySnapshot.size}`);
 
-    let tickets = [];
     querySnapshot.forEach((doc) => {
-        let ticket = { id: doc.id, ...doc.data() };
-        tickets.push(ticket);
-    });
+        const ticket = doc.data();
+        const ticketHTML = createTicketHTML(doc.id, ticket);
 
-    // Priority mapping
-    const priorityMap = { 'High': 3, 'Medium': 2, 'Low': 1 };
-
-    // Sort tickets by priority
-    tickets.sort((a, b) => priorityMap[b.priority] - priorityMap[a.priority]);
-
-    tickets.forEach((ticket) => {
-        console.log(`Processing ticket: ${ticket.id}`, ticket);
-
-        // Format the creation date
-        const createdAt = ticket.created.toDate(); // Convert timestamp to Date object
-        const formattedDate = createdAt.toLocaleDateString("en-US", { year: 'numeric', month: 'long', day: 'numeric' });
-
-        let ticketHTML = `<div class='ticket-item' style='display: block;'>
-            <h2>${ticket.title}</h2>
-            <b>From:</b> ${ticket.requestor}
-            <p>${ticket.priority} Priority - Created: ${formattedDate}</p>
-            <p>${ticket.status}</p>
-            <div id='ticketsinside'>
-                ${ticket.description}
-            </div>
-            <br>
-            ${getAssignmentControl(ticket.id, ticket.status)}
-        </div>`;
-
-        // Check if the ticket is New, it should always be visible in open tickets
-        if (ticket.status === "New") {
+        if (ticket.status === "Recently Deleted") {
+            deletedTicketsList.innerHTML += ticketHTML;
+        } else if (ticket.status === "New" && (filter === "all" || ticket.requestor === filter)) {
             openTicketsList.innerHTML += ticketHTML;
-        } else {
-            // For non-new tickets, apply the filter
-            let isVisible = (filter === 'all' || ticket.status.includes(`Assigned to ${filter}`));
-            if (isVisible) {
-                pendingTicketsList.innerHTML += ticketHTML;
-            }
+        } else if (filter === "all" || ticket.requestor === filter) {
+            pendingTicketsList.innerHTML += ticketHTML;
         }
     });
-	//const querySnapshot = await getDocs(collection(db, "tickets"));
-	let members = Array.from(document.getElementById('memberSelect').options).map(option => option.value);
-    updateSortFilter(members);
 };
+
+function createTicketHTML(docId, ticket) {
+    const createdAt = ticket.created.toDate();
+    const formattedDate = createdAt.toLocaleDateString("en-US", { year: 'numeric', month: 'long', day: 'numeric' });
+    return `<div class='ticket-item' style='display: block;'>
+        <h2>${ticket.title}</h2>
+        <b>From:</b> ${ticket.requestor}
+        <p>${ticket.priority} Priority - Created: ${formattedDate}</p>
+        <p>${ticket.status}</p>
+        <div id='ticketsinside'>${ticket.description}</div>
+        <br>
+        ${getAssignmentControl(docId, ticket.status)}
+    </div>`;
+}
 
 
 
@@ -481,13 +513,7 @@ window.loadTickets = async () => {
             loadTickets();  // Reload tickets to reflect the change
         };
 
-        window.deleteTicket = async (docId) => {
-            if (confirm("Are you sure you want to delete this ticket?")) {
-                await deleteDoc(doc(db, "tickets", docId));
-                console.log("Ticket deleted!");
-                loadTickets();  // Reload tickets to reflect the change
-            }
-        };
+       
 
         
 window.onload = async () => {
