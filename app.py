@@ -93,12 +93,29 @@ def get_html_content():
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Alco Ticketing System</title>
+    <title>SCADA Ticketing System</title>
 	
 	
 
 
    <style>
+   
+   
+   
+   
+   
+   #deletedTicketsContainer {
+    display: block;
+    justify-content: center;
+    margin-bottom: 20px;
+	 border: 4px solid lightblue; /* Set the border color */
+        border-radius: 10px;        /* Rounded corners */
+        padding: 20px;              /* Some padding inside the border */
+        margin: 10px;               /* Margin outside the border */
+        background-color: #ffffff;  /* Light blue background */
+        width: 80%;               /* Fixed width */
+        height: 100% 
+}
    
    
   #memberManagement {
@@ -171,6 +188,8 @@ button {
         width: 80%;               /* Fixed width */
         height: 10%               /* Automatic height adjustment */
     }
+	
+	
 
     #tickets {
         border: 4px solid lightblue; /* Set the border color */
@@ -188,7 +207,7 @@ button {
     }
     input[type="text"], textarea {
         width: 200px;
-        height: 30px;
+        height: 40px;
         padding: 10px;
         margin-top: 5px;
         margin-bottom: 10px;
@@ -202,7 +221,7 @@ button {
         color: #fff;
         border: none;
 		height: 40px;
-        border-radius: 5px;
+        border-radius: 40px;
         padding: 10px 20px;
         margin-top: 10px;
         cursor: pointer;
@@ -221,7 +240,10 @@ button {
 <center>
     <!-- Ticket Submission Form -->
     <div id = "tickets">
-        <h2>Submit a Ticket</h2>
+        <h2><u>Submit a Ticket</u></h2>
+		
+		
+		<div id="ticketsinside">
         <input type="text" id="ticketTitle" placeholder="Ticket Issue"><br>
         <input type="text" id="ticketName" placeholder="Requester"><br>
         <textarea id="ticketDesc" placeholder="Description"></textarea><br>
@@ -232,6 +254,7 @@ button {
         </select><br>
         <button onclick="submitTicket()">Submit Ticket</button>
     </div>
+	</div>
 
 
 
@@ -257,7 +280,7 @@ button {
 	 <div class="tickets-container">
 	 
 	<div id = "tickets">
-	<h2>Open Tickets</h2>
+	<h2><u>Open Tickets</u></h2>
 	
 	<div id="openTicketsList" class="tickets-container">
     
@@ -269,7 +292,7 @@ button {
 <div id = "tickets">
 <!-- Pending Tickets -->
 
-<h2>Pending Tickets</h2>
+<h2><u>Pending Tickets</u></h2>
 
 <select id="sortFilter" onchange="loadTickets()">
     <option value="all">All</option> <!-- Ensure this is present -->
@@ -287,23 +310,29 @@ button {
 
 
 </div>
-
+<br>
+	
+	<br>
 
 <div id="memberManagement">
     <h2>Manage Members</h2>
-	<br>
+	
+	<div id="allmembers">  </div>
 	
 	
 	<div id = "insidemembers">
-	<button onclick="addMember()">Add New Member</button>
-	
+	<p><h3> Add a new member to the team </h3></p>
+	<button onclick="addMember()"> Add New Member</button>
+	</div>
 	
 	
 	<br>
     
+<div id = "insidemembers">
+
+<p><h3> Remove a memeber from the team </h3> </p>
+
         <div id="memberList">
-		
-		
 		
             <select id="memberSelect">
                 <option value="Adnen">Adnen</option>
@@ -313,7 +342,7 @@ button {
         
         
         <button onclick="deleteMember()">Delete Member</button>
-		
+</div>
 		</div>
 		
     </div>
@@ -325,6 +354,10 @@ button {
 
 
 
+<div id="deletedTicketsContainer">
+    <h2>Recently Deleted Tickets</h2>
+    <div id="deletedTicketsList" class="tickets-container"></div>
+</div>
 
 
 	
@@ -377,6 +410,36 @@ import { getFirestore, doc, setDoc, getDoc, collection, getDocs, addDoc, updateD
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+window.deleteTicket = async (docId) => {
+    if (confirm("Are you sure you want to delete this ticket?")) {
+        const ticketRef = doc(db, "tickets", docId);
+        await updateDoc(ticketRef, {
+            status: "Recently Deleted",
+            deletedAt: new Date()  // Ensure this field is updated when the ticket is deleted
+        });
+        console.log("Ticket marked as recently deleted!");
+        loadTickets();  // Reload tickets to reflect changes
+    }
+};
+
+
+
+
+
 window.deleteMember = async () => {
     const memberSelect = document.getElementById('memberSelect');
     const selectedMember = memberSelect.value;
@@ -407,8 +470,28 @@ window.loadMembers = async () => {
     const membersRef = collection(db, "members");
     const memberSnapshot = await getDocs(membersRef);
     const members = memberSnapshot.docs.map(doc => doc.data().name);
+
+    // Update dropdowns
     updateMemberDropdowns(members);
+
+    // Check if the paragraph already exists
+    let memberNamesPara = document.getElementById('memberNamesPara');
+    if (!memberNamesPara) {
+        // Create a new paragraph if it doesn't exist
+        memberNamesPara = document.createElement('p');
+        memberNamesPara.id = 'memberNamesPara'; // Assign an ID for future reference
+        const memberManagementDiv = document.getElementById('allmembers');
+        memberManagementDiv.appendChild(memberNamesPara);
+    }
+    
+    // Update the text content of the paragraph
+    memberNamesPara.textContent = 'Members: ' + members.join(', '); // Concatenate all member names
+    memberNamesPara.style.padding = '10px';
+    memberNamesPara.style.marginTop = '10px';
+    memberNamesPara.style.backgroundColor = '#e0f7fa';
 };
+
+
 
 function updateMemberDropdowns(members) {
     const memberSelect = document.getElementById('memberSelect');
@@ -443,6 +526,19 @@ window.addMember = async () => {
 };
 
 
+window.restoreTicket = async (docId) => {
+    if (confirm("Are you sure you want to re-open this ticket?")) {
+        const ticketRef = doc(db, "tickets", docId);
+        await updateDoc(ticketRef, {
+            status: "New"
+        });
+        console.log("Ticket restored!");
+        loadTickets();  // Reload tickets to update display
+    }
+};
+
+
+
 
 function getAssignmentControl(docId, status) {
     let members = Array.from(document.getElementById('memberSelect').options).map(option => option.value);
@@ -453,8 +549,13 @@ function getAssignmentControl(docId, status) {
                     <option value=''>Assign Ticket</option>
                     ${optionsHTML}
                 </select>
-                <br><button onclick='deleteTicket("${docId}")'>Delete</button> <button onclick='assignTicket("${docId}")'>Save</button> <br><br>`;
+                <br><button onclick='deleteTicket("${docId}")'>Delete</button> 
+                <button onclick='assignTicket("${docId}")'>Save</button> <br><br>`;
+    } else if (status === "Recently Deleted") {
+        // Only show a "Restore" button for recently deleted tickets
+        return `<button onclick='restoreTicket("${docId}")'>Restore</button><br><br>`;
     } else {
+        // For all other statuses, provide a way to unassign or delete
         return `<button onclick='unassignTicket("${docId}")'>Unassign</button>
                 <button onclick='deleteTicket("${docId}")'>Delete</button><br><br>`;
     }
@@ -469,18 +570,6 @@ function getAssignmentControl(docId, status) {
 
 
 
-function updateSortFilter(members) {
-    const sortFilter = document.getElementById('sortFilter');
-    sortFilter.innerHTML = '<option value="all">All Tickets</option>';
-    members.forEach(member => {
-        const option = document.createElement('option');
-        option.value = member;
-        option.text = member;
-        sortFilter.appendChild(option);
-    });
-}
-
-
 
 
 
@@ -490,61 +579,56 @@ window.loadTickets = async () => {
     console.log("Loading tickets...");
     const openTicketsList = document.getElementById('openTicketsList');
     const pendingTicketsList = document.getElementById('pendingTicketsList');
+    const deletedTicketsList = document.getElementById('deletedTicketsList');
     const filter = document.getElementById('sortFilter').value;
 
     // Clear the existing content
     openTicketsList.innerHTML = '<h2></h2>';
     pendingTicketsList.innerHTML = '<h2></h2>';
+    deletedTicketsList.innerHTML = '';  // Clear the deleted tickets list
 
     const querySnapshot = await getDocs(collection(db, "tickets"));
     console.log(`Number of tickets fetched: ${querySnapshot.size}`);
 
-    let tickets = [];
     querySnapshot.forEach((doc) => {
-        let ticket = { id: doc.id, ...doc.data() };
-        tickets.push(ticket);
-    });
+        const ticket = doc.data();
+        const ticketHTML = createTicketHTML(doc.id, ticket);
 
-    // Priority mapping
-    const priorityMap = { 'High': 3, 'Medium': 2, 'Low': 1 };
-
-    // Sort tickets by priority
-    tickets.sort((a, b) => priorityMap[b.priority] - priorityMap[a.priority]);
-
-    tickets.forEach((ticket) => {
-        console.log(`Processing ticket: ${ticket.id}`, ticket);
-
-        // Format the creation date
-        const createdAt = ticket.created.toDate(); // Convert timestamp to Date object
-        const formattedDate = createdAt.toLocaleDateString("en-US", { year: 'numeric', month: 'long', day: 'numeric' });
-
-        let ticketHTML = `<div class='ticket-item' style='display: block;'>
-            <h2>${ticket.title}</h2>
-            <b>From:</b> ${ticket.requestor}
-            <p>${ticket.priority} Priority - Created: ${formattedDate}</p>
-            <p>${ticket.status}</p>
-            <div id='ticketsinside'>
-                ${ticket.description}
-            </div>
-            <br>
-            ${getAssignmentControl(ticket.id, ticket.status)}
-        </div>`;
-
-        // Check if the ticket is New, it should always be visible in open tickets
-        if (ticket.status === "New") {
+        if (ticket.status === "Recently Deleted") {
+            deletedTicketsList.innerHTML += ticketHTML;
+        } else if (ticket.status === "New" && (filter === "all" || ticket.requestor === filter)) {
             openTicketsList.innerHTML += ticketHTML;
-        } else {
-            // For non-new tickets, apply the filter
-            let isVisible = (filter === 'all' || ticket.status.includes(`Assigned to ${filter}`));
-            if (isVisible) {
-                pendingTicketsList.innerHTML += ticketHTML;
-            }
+        } else if (filter === "all" || ticket.requestor === filter) {
+            pendingTicketsList.innerHTML += ticketHTML;
         }
     });
-	//const querySnapshot = await getDocs(collection(db, "tickets"));
-	let members = Array.from(document.getElementById('memberSelect').options).map(option => option.value);
-    updateSortFilter(members);
 };
+
+function createTicketHTML(docId, ticket) {
+    const createdAt = ticket.created.toDate();
+    const formattedCreationDate = createdAt.toLocaleDateString("en-US", { year: 'numeric', month: 'long', day: 'numeric' });
+    let ticketDetails = `<h2>${ticket.title}</h2>
+        <b>From:</b> ${ticket.requestor}
+        <p>${ticket.priority} Priority - Created: ${formattedCreationDate}</p>`;
+    
+    // Append the status, including deletion date if applicable
+    if (ticket.status === "Recently Deleted" && ticket.deletedAt) {
+        const deletedAt = ticket.deletedAt.toDate();
+        const formattedDeletionDate = deletedAt.toLocaleDateString("en-US", { year: 'numeric', month: 'long', day: 'numeric' });
+        ticketDetails += `<p>(Deleted on: ${formattedDeletionDate})</p>`;
+    } else {
+        ticketDetails += `<p>Status: ${ticket.status}</p>`;
+    }
+
+    let ticketHTML = `<div class='ticket-item' style='display: block;'>
+        ${ticketDetails}
+        <div id='ticketsinside'>${ticket.description}</div>
+        <br>${getAssignmentControl(docId, ticket.status)}
+    </div>`;
+
+    return ticketHTML;
+}
+
 
 
 
@@ -572,13 +656,7 @@ window.loadTickets = async () => {
             loadTickets();  // Reload tickets to reflect the change
         };
 
-        window.deleteTicket = async (docId) => {
-            if (confirm("Are you sure you want to delete this ticket?")) {
-                await deleteDoc(doc(db, "tickets", docId));
-                console.log("Ticket deleted!");
-                loadTickets();  // Reload tickets to reflect the change
-            }
-        };
+       
 
         
 window.onload = async () => {
@@ -593,24 +671,18 @@ window.onload = () => {
 loadMembers();
     loadTickets(); // Initial load of tickets
     let members = Array.from(document.getElementById('memberSelect').options).map(option => option.value);
-    updateSortFilter(members); // Setup sort filters with initial members
+     
 };
 
 
-        loadMembers();
+      loadMembers();
     loadTickets(); // Initial load of tickets
     let members = Array.from(document.getElementById('memberSelect').options).map(option => option.value);
-    updateSortFilter(members);
-        
+     
         
     </script>
 </body>
 </html>
-
-
-
-
-
 
 
 
