@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Alco Ticketing System</title>
+    <title>SCADA Ticketing System</title>
 	
 	
 
@@ -213,23 +213,29 @@ button {
 
 
 </div>
-
+<br>
+	
+	<br>
 
 <div id="memberManagement">
     <h2>Manage Members</h2>
-	<br>
+	
+	<div id="allmembers">  </div>
 	
 	
 	<div id = "insidemembers">
-	<button onclick="addMember()">Add New Member</button>
-	
+	<p><h3> Add a new member to the team </h3></p>
+	<button onclick="addMember()"> Add New Member</button>
+	</div>
 	
 	
 	<br>
     
+<div id = "insidemembers">
+
+<p><h3> Remove a memeber from the team </h3> </p>
+
         <div id="memberList">
-		
-		
 		
             <select id="memberSelect">
                 <option value="Adnen">Adnen</option>
@@ -239,7 +245,7 @@ button {
         
         
         <button onclick="deleteMember()">Delete Member</button>
-		
+</div>
 		</div>
 		
     </div>
@@ -365,8 +371,22 @@ window.loadMembers = async () => {
     const membersRef = collection(db, "members");
     const memberSnapshot = await getDocs(membersRef);
     const members = memberSnapshot.docs.map(doc => doc.data().name);
+
+    // Update dropdowns
     updateMemberDropdowns(members);
+
+    // Create a paragraph to list member names
+    const memberNamesPara = document.createElement('p');
+    memberNamesPara.textContent = '' + members.join(', '); // Concatenate all member names
+    memberNamesPara.style.padding = '10px';
+    memberNamesPara.style.marginTop = '10px';
+    memberNamesPara.style.backgroundColor = '#e0f7fa';
+
+    // Append the paragraph to the 'memberManagement' div
+    const memberManagementDiv = document.getElementById('allmembers');
+    memberManagementDiv.appendChild(memberNamesPara);
 };
+
 
 function updateMemberDropdowns(members) {
     const memberSelect = document.getElementById('memberSelect');
