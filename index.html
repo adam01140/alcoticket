@@ -13,38 +13,46 @@
             width: 200px;
             height: 40px;
             margin-top: 10px;
-            border: 2px solid #007BFF; /* Blue border color */
-            background-color: #E3F2FD; /* Light blue background */
+            border: 2px solid #007BFF;
+            background-color: #E3F2FD;
             border-radius: 5px;
             padding: 10px;
             font-size: 16px;
-            color: #007BFF; /* Blue text color */
+            color: #007BFF;
         }
 
         #passwordForm button {
             cursor: pointer;
-            background-color: #007BFF; /* Darker blue background for button */
-            color: white; /* White text for better contrast */
-            border: none; /* No border for the button */
+            background-color: #007BFF;
+            color: white;
+            border: none;
         }
 
         #passwordForm button:hover {
-            background-color: #0056b3; /* Even darker blue on hover */
+            background-color: #0056b3;
         }
     </style>
 </head>
 <body>
     <h1>Welcome To The Alco Water Ticket System</h1>
-    <br>
     <div id="passwordForm">
-        <h2>Please enter the password</h3>
+        <h2>Please enter the password</h2>
         <input type="password" id="passwordInput" placeholder="Enter password">
-        <br>
-		<button onclick="validatePassword()">Submit</button>
+        <button onclick="validatePassword()">Submit</button>
     </div>
     <div id="app" style="display:none;"></div> <!-- Placeholder for dynamic content -->
 
     <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const cookie = getCookie('authToken');
+            if (cookie) {
+                const ageInSeconds = (new Date() - new Date(cookie)) / 1000;
+                if (ageInSeconds < 60) {  // Check if the cookie is less than 1 minute old
+                    fetchProtectedContent();
+                }
+            }
+        });
+
         function validatePassword() {
             const password = document.getElementById('passwordInput').value;
             fetch('/validate_password', {
@@ -54,35 +62,29 @@
                 },
                 body: JSON.stringify({password: password})
             })
-            .then(response => {
-                if (response.ok) {
-                    return response.json();
-                } else {
-                    throw new Error('Invalid password');
-                }
-            })
+            .then(response => response.json())
             .then(data => {
                 if (data.valid) {
+                    document.cookie = "authToken=" + new Date().toISOString() + "; path=/";
                     fetchProtectedContent();
                 } else {
-                    alert('Invalid password');
+                    alert('Wrong Password!');
                 }
             })
             .catch(error => {
                 console.error('Error:', error);
+                alert('Error logging in!');
             });
         }
 
         function fetchProtectedContent() {
-            fetch('/get_html_content').then(function(response) {
-                return response.json();
-            }).then(function(data) {
+            fetch('/get_html_content').then(response => response.json()).then(data => {
                 const container = document.getElementById('app');
                 container.style.display = 'block';
-                container.innerHTML = data.html_content;  // Insert HTML content into the DOM
-                document.getElementById('passwordForm').style.display = 'none';  // Hide the password form
+                container.innerHTML = data.html_content;
+                document.getElementById('passwordForm').style.display = 'none';
                 executeScripts(container);
-            }).catch(function(error) {
+            }).catch(error => {
                 console.error('Failed to load page content:', error);
             });
         }
@@ -97,6 +99,12 @@
                 newScript.text = script.text;
                 script.parentNode.replaceChild(newScript, script);
             }
+        }
+
+        function getCookie(name) {
+            const value = `; ${document.cookie}`;
+            const parts = value.split(`; ${name}=`);
+            if (parts.length === 2) return parts.pop().split(';').shift();
         }
     </script>
 </body>
