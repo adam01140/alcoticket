@@ -192,30 +192,41 @@
 
 
 
-window.addMember = () => {
+window.loadMembers = async () => {
+    const membersRef = collection(db, "members");
+    const memberSnapshot = await getDocs(membersRef);
+    const members = memberSnapshot.docs.map(doc => doc.data().name);
+    updateMemberDropdowns(members);
+};
+
+function updateMemberDropdowns(members) {
+    const memberSelect = document.getElementById('memberSelect');
+    const sortFilter = document.getElementById('sortFilter');
+    const assignSelects = document.querySelectorAll('[id^="assign-"]');
+
+    memberSelect.innerHTML = '';
+    sortFilter.innerHTML = '<option value="all">Sort By Person</option>';
+
+    members.forEach(member => {
+        const option = document.createElement('option');
+        option.value = member;
+        option.text = member;
+
+        memberSelect.appendChild(option.cloneNode(true));
+        sortFilter.appendChild(option.cloneNode(true));
+
+        assignSelects.forEach(select => {
+            select.appendChild(option.cloneNode(true));
+        });
+    });
+}
+
+window.addMember = async () => {
     let newMemberName = prompt("Enter the name of the new member:");
     if (newMemberName) {
-        // Add the new member to the member list and sort filter dropdown
-        const memberSelect = document.getElementById('memberSelect');
-        const sortFilter = document.getElementById('sortFilter');
-        const newOption = document.createElement('option');
-        newOption.value = newMemberName;
-        newOption.text = newMemberName;
-
-        // Add to member management list
-        memberSelect.appendChild(newOption.cloneNode(true));
-        
-        // Add to sort filter dropdown
-        sortFilter.appendChild(newOption.cloneNode(true));
-
-        // Update all existing ticket assignment dropdowns
-        const assignSelects = document.querySelectorAll('[id^="assign-"]');
-        assignSelects.forEach(select => {
-            const option = newOption.cloneNode(true);
-            select.appendChild(option);
-        });
-
-        alert(`${newMemberName} has been added as a member.`);
+        // Add the new member to Firestore
+        await addDoc(collection(db, "members"), { name: newMemberName });
+        loadMembers(); // Reload members from Firestore
     }
 };
 
@@ -358,9 +369,16 @@ window.loadTickets = async () => {
         };
 
         
+window.onload = async () => {
+    await loadTickets(); // Load tickets when the page loads
+    await loadMembers(); // Load members from Firestore
+};
+
+
 
 		// Ensure that onload setup is in place
 window.onload = () => {
+loadMembers();
     loadTickets(); // Initial load of tickets
     let members = Array.from(document.getElementById('memberSelect').options).map(option => option.value);
     updateSortFilter(members); // Setup sort filters with initial members
