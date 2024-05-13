@@ -328,15 +328,17 @@ import { getFirestore, doc, setDoc, getDoc, collection, getDocs, addDoc, updateD
 
 
 window.deleteTicket = async (docId) => {
-    if (confirm("Are you sure you want to mark this ticket as deleted?")) {
+    if (confirm("Are you sure you want to delete this ticket?")) {
         const ticketRef = doc(db, "tickets", docId);
         await updateDoc(ticketRef, {
-            status: "Recently Deleted"
+            status: "Recently Deleted",
+            deletedAt: new Date()  // Ensure this field is updated when the ticket is deleted
         });
         console.log("Ticket marked as recently deleted!");
-        loadTickets();  // Reload tickets to update display
+        loadTickets();  // Reload tickets to reflect changes
     }
 };
+
 
 
 
@@ -427,6 +429,19 @@ window.addMember = async () => {
 };
 
 
+window.restoreTicket = async (docId) => {
+    if (confirm("Are you sure you want to re-open this ticket?")) {
+        const ticketRef = doc(db, "tickets", docId);
+        await updateDoc(ticketRef, {
+            status: "New"
+        });
+        console.log("Ticket restored!");
+        loadTickets();  // Reload tickets to update display
+    }
+};
+
+
+
 
 function getAssignmentControl(docId, status) {
     let members = Array.from(document.getElementById('memberSelect').options).map(option => option.value);
@@ -437,8 +452,13 @@ function getAssignmentControl(docId, status) {
                     <option value=''>Assign Ticket</option>
                     ${optionsHTML}
                 </select>
-                <br><button onclick='deleteTicket("${docId}")'>Delete</button> <button onclick='assignTicket("${docId}")'>Save</button> <br><br>`;
+                <br><button onclick='deleteTicket("${docId}")'>Delete</button> 
+                <button onclick='assignTicket("${docId}")'>Save</button> <br><br>`;
+    } else if (status === "Recently Deleted") {
+        // Only show a "Restore" button for recently deleted tickets
+        return `<button onclick='restoreTicket("${docId}")'>Restore</button><br><br>`;
     } else {
+        // For all other statuses, provide a way to unassign or delete
         return `<button onclick='unassignTicket("${docId}")'>Unassign</button>
                 <button onclick='deleteTicket("${docId}")'>Delete</button><br><br>`;
     }
@@ -451,18 +471,6 @@ function getAssignmentControl(docId, status) {
 
 
 
-
-
-function updateSortFilter(members) {
-    const sortFilter = document.getElementById('sortFilter');
-    sortFilter.innerHTML = '<option value="all">All Tickets</option>';
-    members.forEach(member => {
-        const option = document.createElement('option');
-        option.value = member;
-        option.text = member;
-        sortFilter.appendChild(option);
-    });
-}
 
 
 
@@ -566,7 +574,7 @@ window.onload = () => {
 loadMembers();
     loadTickets(); // Initial load of tickets
     let members = Array.from(document.getElementById('memberSelect').options).map(option => option.value);
-    updateSortFilter(members); // Setup sort filters with initial members
+     
 };
 
 
