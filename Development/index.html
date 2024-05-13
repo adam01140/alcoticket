@@ -112,7 +112,7 @@
 <h2>Pending Tickets</h2>
 
 <select id="sortFilter" onchange="loadTickets()">
-        <option value="all">All</option>
+        <option value="all">Sort By Person</option>
         <option value="Adnen">Adnen</option>
         <option value="David">David</option>
         <option value="Octavio">Octavio</option>
@@ -122,6 +122,23 @@
 <div id="pendingTicketsList">
     
 </div>
+
+
+
+<div id="memberManagement">
+    <h2>Manage Members</h2>
+    <div id="memberList">
+        <select id="memberSelect">
+            <option value="Adnen">Adnen</option>
+            <option value="David">David</option>
+            <option value="Octavio">Octavio</option>
+        </select>
+    </div>
+    <button onclick="addMember()">Add Member</button>
+</div>
+
+
+
 	
 </div>
 
@@ -168,6 +185,84 @@
     }
 };
 
+
+
+
+
+
+
+
+window.addMember = () => {
+    let newMemberName = prompt("Enter the name of the new member:");
+    if (newMemberName) {
+        // Add the new member to the member list and sort filter dropdown
+        const memberSelect = document.getElementById('memberSelect');
+        const sortFilter = document.getElementById('sortFilter');
+        const newOption = document.createElement('option');
+        newOption.value = newMemberName;
+        newOption.text = newMemberName;
+
+        // Add to member management list
+        memberSelect.appendChild(newOption.cloneNode(true));
+        
+        // Add to sort filter dropdown
+        sortFilter.appendChild(newOption.cloneNode(true));
+
+        // Update all existing ticket assignment dropdowns
+        const assignSelects = document.querySelectorAll('[id^="assign-"]');
+        assignSelects.forEach(select => {
+            const option = newOption.cloneNode(true);
+            select.appendChild(option);
+        });
+
+        alert(`${newMemberName} has been added as a member.`);
+    }
+};
+
+
+
+function getAssignmentControl(docId, status) {
+    let members = Array.from(document.getElementById('memberSelect').options).map(option => option.value);
+    let optionsHTML = members.map(member => `<option value='${member}'>${member}</option>`).join('');
+
+    if (status === "New") {
+        return `<select id='assign-${docId}'>
+                    <option value=''>Assign Ticket</option>
+                    ${optionsHTML}
+                </select>
+                <br><button onclick='deleteTicket("${docId}")'>Delete</button> <button onclick='assignTicket("${docId}")'>Save</button>`;
+    } else {
+        return `<button onclick='unassignTicket("${docId}")'>Unassign</button>
+                <button onclick='deleteTicket("${docId}")'>Delete</button>`;
+    }
+}
+
+
+
+
+
+
+
+
+
+
+function updateSortFilter(members) {
+    const sortFilter = document.getElementById('sortFilter');
+    sortFilter.innerHTML = '<option value="all">Sort By Person</option>';
+    members.forEach(member => {
+        const option = document.createElement('option');
+        option.value = member;
+        option.text = member;
+        sortFilter.appendChild(option);
+    });
+}
+
+
+
+
+
+
+
 window.loadTickets = async () => {
     console.log("Loading tickets...");
     const openTicketsList = document.getElementById('openTicketsList');
@@ -176,7 +271,7 @@ window.loadTickets = async () => {
 
     // Clear the existing content
     openTicketsList.innerHTML = '<h2>Open Tickets</h2>';
-    pendingTicketsList.innerHTML = '<h2>Pending Tickets</h2>';
+    pendingTicketsList.innerHTML = '<h2></h2>';
 
     const querySnapshot = await getDocs(collection(db, "tickets"));
     console.log(`Number of tickets fetched: ${querySnapshot.size}`);
@@ -223,22 +318,12 @@ window.loadTickets = async () => {
             }
         }
     });
+	//const querySnapshot = await getDocs(collection(db, "tickets"));
+	let members = Array.from(document.getElementById('memberSelect').options).map(option => option.value);
+    updateSortFilter(members);
 };
 
-function getAssignmentControl(docId, status) {
-    if (status === "New") {
-        return `<select id='assign-${docId}'>
-                    <option value=''>Assign Ticket</option>
-                    <option value='Adnen'>Adnen</option>
-                    <option value='David'>David</option>
-                    <option value='Octavio'>Octavio</option>
-                </select>
-                <br><button onclick='deleteTicket("${docId}")'>Delete</button> <button onclick='assignTicket("${docId}")'>Save</button>`;
-    } else {
-        return `<button onclick='unassignTicket("${docId}")'>Unassign</button>
-                <button onclick='deleteTicket("${docId}")'>Delete</button>`;
-    }
-}
+
 
 
         window.assignTicket = async (docId) => {
@@ -272,11 +357,16 @@ function getAssignmentControl(docId, status) {
             }
         };
 
-        window.onload = () => {
-            loadTickets(); // Load tickets when the page loads
-            //alert("hey");
-        };
         
+
+		// Ensure that onload setup is in place
+window.onload = () => {
+    loadTickets(); // Initial load of tickets
+    let members = Array.from(document.getElementById('memberSelect').options).map(option => option.value);
+    updateSortFilter(members); // Setup sort filters with initial members
+};
+
+
         //loadTickets();
         
         
