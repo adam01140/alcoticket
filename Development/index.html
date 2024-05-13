@@ -5,6 +5,50 @@
     <title>Alco Ticketing System</title>
    <style>
    
+   
+  #memberManagement {
+    display: block;
+    justify-content: center;
+    margin-bottom: 20px;
+	 border: 4px solid lightblue; /* Set the border color */
+        border-radius: 10px;        /* Rounded corners */
+        padding: 20px;              /* Some padding inside the border */
+        margin: 10px;               /* Margin outside the border */
+        background-color: #ffffff;  /* Light blue background */
+        width: 80%;               /* Fixed width */
+        height: 100% 
+}
+
+#memberList{
+    display: flex;
+    align-items: center;
+    justify-content: center; /* Centers the content horizontally */
+}
+
+#memberList {
+    margin-right: 10px;
+	
+}
+
+#insidemembers {
+        border: 4px solid lightblue; /* Set the border color */
+        border-radius: 10px;        /* Rounded corners */
+        padding: 20px;              /* Some padding inside the border */
+        margin: 10px;               /* Margin outside the border */
+        background-color: #ffffff;  /* Light blue background */
+        width: 80%;               /* Fixed width */
+        height: 100%               /* Automatic height adjustment */
+    }
+	
+	
+
+button {
+    margin-left: 10px; /* Ensure consistent spacing between buttons */
+}
+
+
+
+
    .tickets-container {
         display: block;              /* Enable Flexbox */
         justify-content: space-around; /* Distribute space evenly around the items */
@@ -39,7 +83,7 @@
         padding: 20px;              /* Some padding inside the border */
         margin: 10px;               /* Margin outside the border */
         background-color: #ffffff;  /* Light blue background */
-        width: 600px;               /* Fixed width */
+        width: 80%;               /* Fixed width */
         height: 100%               /* Automatic height adjustment */
     }
 
@@ -62,6 +106,7 @@
         background-color: #64adc4;
         color: #fff;
         border: none;
+		height: 40px;
         border-radius: 5px;
         padding: 10px 20px;
         margin-top: 10px;
@@ -124,23 +169,49 @@
 </div>
 
 
+</div>
+
 
 <div id="memberManagement">
     <h2>Manage Members</h2>
-    <div id="memberList">
-        <select id="memberSelect">
-            <option value="Adnen">Adnen</option>
-            <option value="David">David</option>
-            <option value="Octavio">Octavio</option>
-        </select>
+	<br>
+	
+	
+	<div id = "insidemembers">
+	<button onclick="addMember()">Add New Member</button>
+	
+	
+	
+	<br>
+    
+        <div id="memberList">
+		
+		
+		
+            <select id="memberSelect">
+                <option value="Adnen">Adnen</option>
+                <option value="David">David</option>
+                <option value="Octavio">Octavio</option>
+            </select>
+        
+        
+        <button onclick="deleteMember()">Delete Member</button>
+		
+		</div>
+		
     </div>
-    <button onclick="addMember()">Add Member</button>
+	
+	
+	
+
 </div>
+
+
 
 
 
 	
-</div>
+
 
 
 
@@ -189,6 +260,29 @@
 
 
 
+window.deleteMember = async () => {
+    const memberSelect = document.getElementById('memberSelect');
+    const selectedMember = memberSelect.value;
+
+    if (selectedMember) {
+        // Confirm before deleting
+        if (confirm(`Are you sure you want to delete ${selectedMember}?`)) {
+            // Find the document ID of the member in Firestore
+            const membersRef = collection(db, "members");
+            const q = query(membersRef, where("name", "==", selectedMember));
+            const querySnapshot = await getDocs(q);
+            querySnapshot.forEach(async (doc) => {
+                await deleteDoc(doc.ref); // Delete the document
+            });
+
+            // Reload members to update UI
+            loadMembers();
+            alert(`${selectedMember} has been deleted.`);
+        }
+    } else {
+        alert("Please select a member to delete.");
+    }
+};
 
 
 
