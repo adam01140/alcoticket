@@ -4,9 +4,14 @@
     <meta charset="UTF-8">
     <title>App Interface</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
+	
+	body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             text-align: center;
+            background: linear-gradient(to right, #83a4d4, #b6fbff);
+            margin: 0;
+			align-items: center;
+
         }
 
         #passwordForm input[type="password"], #passwordForm button {
@@ -27,21 +32,57 @@
             color: white;
             border: none;
         }
+		
+		#box {
+   
+		border: 4px solid white; /* Set the border color */
+        border-radius: 10px;        /* Rounded corners */
+        padding: 20px;              /* Some padding inside the border */
+        margin: 10px;               /* Margin outside the border */
+        width: 50%;               /* Fixed width */
+        height: 100% 
+}
 
         #passwordForm button:hover {
             background-color: #0056b3;
         }
     </style>
+	
+	
+	<br><br>
+	
+	<center>
+	<div id="box">
+	<h1>Welcome To SCADA Ticket System</h1>
+	</div>
+	
 </head>
+
+
+
+
 <body>
-    <h1>Welcome To The Alco Water Ticket System</h1>
+    
+	
+	
+	
+	
+	<center>
+	
+	<div id="box">
+	
     <div id="passwordForm">
-        <h2>Please enter the password</h2>
+        <h3>Enter the password below</h3>
         <input type="password" id="passwordInput" placeholder="Enter password">
+		<br>
         <button onclick="validatePassword()">Submit</button>
     </div>
     <div id="app" style="display:none;"></div> <!-- Placeholder for dynamic content -->
-
+	</div>
+	
+	
+	
+</body>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const cookie = getCookie('authToken');
