@@ -375,17 +375,23 @@ window.loadMembers = async () => {
     // Update dropdowns
     updateMemberDropdowns(members);
 
-    // Create a paragraph to list member names
-    const memberNamesPara = document.createElement('p');
-    memberNamesPara.textContent = '' + members.join(', '); // Concatenate all member names
+    // Check if the paragraph already exists
+    let memberNamesPara = document.getElementById('memberNamesPara');
+    if (!memberNamesPara) {
+        // Create a new paragraph if it doesn't exist
+        memberNamesPara = document.createElement('p');
+        memberNamesPara.id = 'memberNamesPara'; // Assign an ID for future reference
+        const memberManagementDiv = document.getElementById('allmembers');
+        memberManagementDiv.appendChild(memberNamesPara);
+    }
+    
+    // Update the text content of the paragraph
+    memberNamesPara.textContent = 'Members: ' + members.join(', '); // Concatenate all member names
     memberNamesPara.style.padding = '10px';
     memberNamesPara.style.marginTop = '10px';
     memberNamesPara.style.backgroundColor = '#e0f7fa';
-
-    // Append the paragraph to the 'memberManagement' div
-    const memberManagementDiv = document.getElementById('allmembers');
-    memberManagementDiv.appendChild(memberNamesPara);
 };
+
 
 
 function updateMemberDropdowns(members) {
@@ -495,17 +501,29 @@ window.loadTickets = async () => {
 
 function createTicketHTML(docId, ticket) {
     const createdAt = ticket.created.toDate();
-    const formattedDate = createdAt.toLocaleDateString("en-US", { year: 'numeric', month: 'long', day: 'numeric' });
-    return `<div class='ticket-item' style='display: block;'>
-        <h2>${ticket.title}</h2>
+    const formattedCreationDate = createdAt.toLocaleDateString("en-US", { year: 'numeric', month: 'long', day: 'numeric' });
+    let ticketDetails = `<h2>${ticket.title}</h2>
         <b>From:</b> ${ticket.requestor}
-        <p>${ticket.priority} Priority - Created: ${formattedDate}</p>
-        <p>${ticket.status}</p>
+        <p>${ticket.priority} Priority - Created: ${formattedCreationDate}</p>`;
+    
+    // Append the status, including deletion date if applicable
+    if (ticket.status === "Recently Deleted" && ticket.deletedAt) {
+        const deletedAt = ticket.deletedAt.toDate();
+        const formattedDeletionDate = deletedAt.toLocaleDateString("en-US", { year: 'numeric', month: 'long', day: 'numeric' });
+        ticketDetails += `<p>(Deleted on: ${formattedDeletionDate})</p>`;
+    } else {
+        ticketDetails += `<p>Status: ${ticket.status}</p>`;
+    }
+
+    let ticketHTML = `<div class='ticket-item' style='display: block;'>
+        ${ticketDetails}
         <div id='ticketsinside'>${ticket.description}</div>
-        <br>
-        ${getAssignmentControl(docId, ticket.status)}
+        <br>${getAssignmentControl(docId, ticket.status)}
     </div>`;
+
+    return ticketHTML;
 }
+
 
 
 
