@@ -110,10 +110,10 @@ def get_html_content():
     margin-bottom: 20px;
 	 border: 4px solid lightblue; /* Set the border color */
         border-radius: 10px;        /* Rounded corners */
-        padding: 0px;              /* Some padding inside the border */
+        padding: 10px;              /* Some padding inside the border */
         margin: 0px;               /* Margin outside the border */
         background-color: #ffffff;  /* Light blue background */
-        width: 100%;               /* Fixed width */
+        width: 97%;               /* Fixed width */
         height: 100% 
 }
    
@@ -124,7 +124,7 @@ def get_html_content():
     margin-bottom: 20px;
 	 border: 4px solid lightblue; /* Set the border color */
         border-radius: 10px;        /* Rounded corners */
-        padding: 0px;              /* Some padding inside the border */
+        padding: 10px;              /* Some padding inside the border */
         margin: 10px;               /* Margin outside the border */
         background-color: #ffffff;  /* Light blue background */
         width: 100%;               /* Fixed width */
@@ -171,7 +171,7 @@ button {
     .ticket-item {
         border: 4px solid lightblue; /* Set the border color */
         border-radius: 10px;        /* Rounded corners */
-        padding: 0px;              /* Some padding inside the border */
+        padding: 10px;              /* Some padding inside the border */
         margin: 10px;               /* Margin outside the border */
         background-color: #ffffff;  /* Light blue background */
         width: calc(45% - 20px);    /* Calculate width, subtracting margins */
@@ -182,7 +182,7 @@ button {
 	#ticketsinside {
         border: 4px solid lightblue; /* Set the border color */
         border-radius: 10px;        /* Rounded corners */
-        padding: 0px;              /* Some padding inside the border */
+        padding: 10px;              /* Some padding inside the border */
         margin: 10px;               /* Margin outside the border */
         background-color: #ffffff;  /* Light blue background */
         width: 90%;               /* Fixed width */
@@ -197,7 +197,7 @@ button {
     margin-bottom: 20px;
 	 border: 4px solid lightblue; /* Set the border color */
         border-radius: 10px;        /* Rounded corners */
-        padding: 0px;              /* Some padding inside the border */
+        padding: 10px;              /* Some padding inside the border */
         margin: 10px;               /* Margin outside the border */
         background-color: #ffffff;  /* Light blue background */
         width: 95%;               /* Fixed width */
@@ -247,6 +247,7 @@ button {
 		
 		
 		<div id="ticketsinside">
+		<br><br>
         <input type="text" id="ticketTitle" placeholder="Ticket Issue"><br>
         <input type="text" id="ticketName" placeholder="Requester"><br>
         <textarea id="ticketDesc" placeholder="Description"></textarea><br>
@@ -256,6 +257,7 @@ button {
             <option value="High">High Priority</option>
         </select><br>
         <button onclick="submitTicket()">Submit Ticket</button>
+		<br><br><br>
     </div>
 	</div>
 
@@ -326,6 +328,7 @@ button {
 	<div id = "insidemembers">
 	<p><h3> Add a new member to the team </h3></p>
 	<button onclick="addMember()"> Add New Member</button>
+	<br><br>
 	</div>
 	
 	
@@ -345,6 +348,7 @@ button {
         
         
         <button onclick="deleteMember()">Delete Member</button>
+		<br><br><br><br><br>
 </div>
 		</div>
 		
@@ -553,7 +557,7 @@ function getAssignmentControl(docId, status) {
                     ${optionsHTML}
                 </select>
                 <br><button onclick='deleteTicket("${docId}")'>Delete</button> 
-                <button onclick='assignTicket("${docId}")'>Save</button> <br><br>`;
+                <button onclick='assignTicket("${docId}")'>Save</button> <br><br><br>`;
     } else if (status === "Recently Deleted") {
         // Only show a "Restore" button for recently deleted tickets
         return `<button onclick='restoreTicket("${docId}")'>Restore</button><br><br>`;
@@ -676,10 +680,7 @@ loadMembers();
     let members = Array.from(document.getElementById('memberSelect').options).map(option => option.value);
      
 };
-loadMembers();
-    loadTickets(); // Initial load of tickets
-    let members = Array.from(document.getElementById('memberSelect').options).map(option => option.value);
-     
+
 
         //loadTickets();
         
