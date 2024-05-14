@@ -2,137 +2,641 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>SCADA TICKETING</title>
-    <style>
-	
-
-		
-
-        #passwordForm input[type="password"], #passwordForm button {
-            width: 200px;
-            height: 40px;
-            margin-top: 10px;
-            border: 2px solid #007BFF;
-            background-color: #E3F2FD;
-            border-radius: 5px;
-            padding: 10px;
-            font-size: 16px;
-            color: #007BFF;
-        }
-
-        #passwordForm button {
-            cursor: pointer;
-            background-color: #007BFF;
-            color: white;
-            border: none;
-        }
-		
-		
-
-        #passwordForm button:hover {
-            background-color: #0056b3;
-        }
-    </style>
+    <title>SCADA Ticketing System</title>
 	
 	
-	<br><br>
+
+
+   <style>
+   
+   
+   
+   
+   
+   #deletedTicketsContainer {
+    display: block;
+    justify-content: center;
+    margin-bottom: 20px;
+	 border: 4px solid lightblue; /* Set the border color */
+        border-radius: 10px;        /* Rounded corners */
+        padding: 10px;              /* Some padding inside the border */
+        margin: 0px;               /* Margin outside the border */
+        background-color: #ffffff;  /* Light blue background */
+        width: 97%;               /* Fixed width */
+        height: 100% 
+}
+   
+   
+  #memberManagement {
+    display: block;
+    justify-content: center;
+    margin-bottom: 20px;
+	 border: 4px solid lightblue; /* Set the border color */
+        border-radius: 10px;        /* Rounded corners */
+        padding: 10px;              /* Some padding inside the border */
+        margin: 10px;               /* Margin outside the border */
+        background-color: #ffffff;  /* Light blue background */
+        width: 100%;               /* Fixed width */
+        height: 100% 
+}
+
+#memberList{
+    display: flex;
+    align-items: center;
+    justify-content: center; /* Centers the content horizontally */
+}
+
+#memberList {
+    margin-right: 10px;
 	
-	<center>
-	<div id="box">
-	<h1>Welcome To The SCADA Ticketing System</h1>
-	</div>
+}
+
+#insidemembers {
+        border: 4px solid lightblue; /* Set the border color */
+        border-radius: 10px;        /* Rounded corners */
+        padding: 0px;              /* Some padding inside the border */
+        margin: 10px;               /* Margin outside the border */
+        background-color: #ffffff;  /* Light blue background */
+        width: 90%;               /* Fixed width */
+        height: 100%               /* Automatic height adjustment */
+    }
 	
-</head>
+	
+
+button {
+    margin-left: 10px; /* Ensure consistent spacing between buttons */
+}
 
 
 
 
-<body>
+   .tickets-container {
+        display: flex;              /* Enable Flexbox */
+        flex-wrap: wrap;            /* Allow items to wrap onto the next line */
+        justify-content: center; /* Distribute space evenly around the items */
+               /* Take full width of the container */
+    }
     
+    .ticket-item {
+        border: 4px solid lightblue; /* Set the border color */
+        border-radius: 10px;        /* Rounded corners */
+        padding: 10px;              /* Some padding inside the border */
+        margin: 10px;               /* Margin outside the border */
+        background-color: #ffffff;  /* Light blue background */
+        width: calc(45% - 20px);    /* Calculate width, subtracting margins */
+        box-sizing: border-box;     /* Include padding and border in the element's total width */
+    }
 	
 	
+	#ticketsinside {
+        border: 4px solid lightblue; /* Set the border color */
+        border-radius: 10px;        /* Rounded corners */
+        padding: 10px;              /* Some padding inside the border */
+        margin: 10px;               /* Margin outside the border */
+        background-color: #ffffff;  /* Light blue background */
+        width: 90%;               /* Fixed width */
+        height: 10%               /* Automatic height adjustment */
+    }
 	
 	
-	<center>
-	
-	<div id="box">
-	
-    <div id="passwordForm">
-        <h3>Enter the password below</h3>
-        <input type="password" id="passwordInput" placeholder="Enter password">
-		<br>
-        <button onclick="validatePassword()">Submit</button>
+
+    #tickets {
+        display: block;
+    justify-content: center;
+    margin-bottom: 20px;
+	 border: 4px solid lightblue; /* Set the border color */
+        border-radius: 10px;        /* Rounded corners */
+        padding: 10px;              /* Some padding inside the border */
+        margin: 10px;               /* Margin outside the border */
+        background-color: #ffffff;  /* Light blue background */
+        width: 95%;               /* Fixed width */
+        height: 100%              /* Automatic height adjustment */
+    }
+
+    /* Existing styles */
+    body {
+        font-family: Arial, sans-serif;
+    }
+    input[type="text"], textarea {
+        width: 200px;
+        height: 40px;
+        padding: 10px;
+        margin-top: 5px;
+        margin-bottom: 10px;
+        border: 2px solid #64adc4;
+        border-radius: 5px;
+        background-color: #eaf6f9;
+        box-sizing: border-box;
+    }
+    button, select {
+        background-color: #64adc4;
+        color: #fff;
+        border: none;
+		height: 40px;
+        border-radius: 40px;
+        padding: 10px 20px;
+        margin-top: 10px;
+        cursor: pointer;
+    }
+    select {
+        text-align: center;
+        width: 200px;
+        height: 40px;
+        padding-left: 0px;
+        border: 1px solid #4CAF50;
+    }
+</style>
+
+</head>
+<body>
+<center>
+    <!-- Ticket Submission Form -->
+    <div id = "tickets">
+        <h2><u>Submit a Ticket</u></h2>
+		
+		
+		<div id="ticketsinside">
+		<br><br>
+        <input type="text" id="ticketTitle" placeholder="Ticket Issue"><br>
+        <input type="text" id="ticketName" placeholder="Requester"><br>
+        <textarea id="ticketDesc" placeholder="Description"></textarea><br>
+        <select id="ticketPriority">
+            <option value="Low">Low Priority</option>
+            <option value="Medium">Medium Priority</option>
+            <option value="High">High Priority</option>
+        </select><br>
+        <button onclick="submitTicket()">Submit Ticket</button>
+		<br><br><br>
     </div>
-    <div id="app" style="display:none;"></div> <!-- Placeholder for dynamic content -->
+	</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	
+	 <div class="tickets-container">
+	 
+	<div id = "tickets">
+	<h2><u>Open Tickets</u></h2>
+	
+	<div id="openTicketsList" class="tickets-container">
+    
+</div>
+
+</div>
+<br>
+
+<div id = "tickets">
+<!-- Pending Tickets -->
+
+<h2><u>Pending Tickets</u></h2>
+
+<select id="sortFilter" onchange="loadTickets()">
+    <option value="all">All</option> <!-- Ensure this is present -->
+    <option value="Adnen">Adnen</option>
+    <option value="David">David</option>
+    <option value="Octavio">Octavio</option>
+</select>
+
+<br>
+	<br>
+	
+<div id="pendingTicketsList" class="tickets-container">
+    
+</div>
+
+
+</div>
+<br>
+	
+	<br>
+
+<div id="memberManagement">
+    <h2>Manage Members</h2>
+	
+	<div id="allmembers">  </div>
+	
+	
+	<div id = "insidemembers">
+	<p><h3> Add a new member to the team </h3></p>
+	<button onclick="addMember()"> Add New Member</button>
+	<br><br>
 	</div>
 	
 	
+	<br>
+    
+<div id = "insidemembers">
+
+<p><h3> Remove a member from the team </h3> </p>
+
+        <div id="memberList">
+		
+            <select id="memberSelect">
+                <option value="Adnen">Adnen</option>
+                <option value="David">David</option>
+                <option value="Octavio">Octavio</option>
+            </select>
+        
+        
+        <button onclick="deleteMember()">Delete Member</button>
+		<br><br><br><br><br><br>
+</div>
+		</div>
+		
+    </div>
 	
-</body>
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const cookie = getCookie('authToken');
-            if (cookie) {
-                const ageInSeconds = (new Date() - new Date(cookie)) / 1000;
-                if (ageInSeconds < 60) {  // Check if the cookie is less than 1 minute old
-                    fetchProtectedContent();
-                }
-            }
+	
+	
+
+</div>
+
+
+
+<div id="deletedTicketsContainer">
+    <h2>Recently Deleted Tickets</h2>
+    <div id="deletedTicketsList" class="tickets-container"></div>
+</div>
+
+
+	
+
+
+
+
+    
+	</div>
+
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js';
+import { getFirestore, doc, setDoc, getDoc, collection, getDocs, addDoc, updateDoc, deleteDoc, query, where } from 'https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore.js';
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDgqB5FaU1Zreq3H5WwfDo7WSUEkVOdKxU",
+            authDomain: "formfiller-b9856.firebaseapp.com",
+            projectId: "formfiller-b9856",
+            storageBucket: "formfiller-b9856.appspot.com",
+            messagingSenderId: "424653050423",
+            appId: "1:424653050423:web:dfae46bc004eaedefae5b2",
+            measurementId: "G-9WPM6EEMQ7"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+       window.submitTicket = async () => {
+    const title = document.getElementById('ticketTitle').value;
+    const name = document.getElementById('ticketName').value;
+    const description = document.getElementById('ticketDesc').value;
+    const priority = document.getElementById('ticketPriority').value;
+
+    if (title && name && description) {
+        const docRef = await addDoc(collection(db, "tickets"), {
+            title: title,
+            requestor: name,
+            description: description,
+            priority: priority,
+            status: "New", // Default status
+            created: new Date()
         });
 
-        function validatePassword() {
-            const password = document.getElementById('passwordInput').value;
-            fetch('/validate_password', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({password: password})
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.valid) {
-                    document.cookie = "authToken=" + new Date().toISOString() + "; path=/";
-                    fetchProtectedContent();
-                } else {
-                    alert('Wrong Password!');
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('Error logging in!');
-            });
-        }
+        console.log("Ticket submitted with ID:", docRef.id);
+        loadTickets();  // Reload tickets after submission
+    }
+};
 
-        function fetchProtectedContent() {
-            fetch('/get_html_content').then(response => response.json()).then(data => {
-                const container = document.getElementById('app');
-                container.style.display = 'block';
-                container.innerHTML = data.html_content;
-                document.getElementById('passwordForm').style.display = 'none';
-                executeScripts(container);
-            }).catch(error => {
-                console.error('Failed to load page content:', error);
-            });
-        }
 
-        function executeScripts(container) {
-            const scripts = Array.from(container.getElementsByTagName('script'));
-            for (let script of scripts) {
-                const newScript = document.createElement('script');
-                if (script.type === 'module') {
-                    newScript.type = 'module';
-                }
-                newScript.text = script.text;
-                script.parentNode.replaceChild(newScript, script);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+window.deleteTicket = async (docId) => {
+    if (confirm("Are you sure you want to delete this ticket?")) {
+        const ticketRef = doc(db, "tickets", docId);
+        await updateDoc(ticketRef, {
+            status: "Recently Deleted",
+            deletedAt: new Date()  // Ensure this field is updated when the ticket is deleted
+        });
+        console.log("Ticket marked as recently deleted!");
+        loadTickets();  // Reload tickets to reflect changes
+    }
+};
+
+
+
+
+
+window.deleteMember = async () => {
+    const memberSelect = document.getElementById('memberSelect');
+    const selectedMember = memberSelect.value;
+
+    if (selectedMember) {
+        // Confirm before deleting
+        if (confirm(`Are you sure you want to delete ${selectedMember}?`)) {
+            const membersRef = collection(db, "members");
+            const q = query(membersRef, where("name", "==", selectedMember));
+            const querySnapshot = await getDocs(q);
+            querySnapshot.forEach(async (doc) => {
+                await deleteDoc(doc.ref); // Delete the document
+            });
+
+            // Reload members to update UI
+            loadMembers();
+            alert(`${selectedMember} has been deleted.`);
+        }
+    } else {
+        alert("Please select a member to delete.");
+    }
+};
+
+
+
+
+window.loadMembers = async () => {
+    const membersRef = collection(db, "members");
+    const memberSnapshot = await getDocs(membersRef);
+    const members = memberSnapshot.docs.map(doc => doc.data().name);
+
+    // Update dropdowns
+    updateMemberDropdowns(members);
+
+    // Check if the paragraph already exists
+    let memberNamesPara = document.getElementById('memberNamesPara');
+    if (!memberNamesPara) {
+        // Create a new paragraph if it doesn't exist
+        memberNamesPara = document.createElement('p');
+        memberNamesPara.id = 'memberNamesPara'; // Assign an ID for future reference
+        const memberManagementDiv = document.getElementById('allmembers');
+        memberManagementDiv.appendChild(memberNamesPara);
+    }
+    
+    // Update the text content of the paragraph
+    memberNamesPara.textContent = 'Members: ' + members.join(', '); // Concatenate all member names
+    memberNamesPara.style.padding = '10px';
+    memberNamesPara.style.marginTop = '10px';
+    memberNamesPara.style.backgroundColor = '#e0f7fa';
+};
+
+
+
+function updateMemberDropdowns(members) {
+    const memberSelect = document.getElementById('memberSelect');
+    const sortFilter = document.getElementById('sortFilter');
+    const assignSelects = document.querySelectorAll('[id^="assign-"]');
+
+    memberSelect.innerHTML = '';
+    sortFilter.innerHTML = '<option value="all">All Tickets</option>';
+
+    members.forEach(member => {
+        const option = document.createElement('option');
+        option.value = member;
+        option.text = member;
+
+        memberSelect.appendChild(option.cloneNode(true));
+        sortFilter.appendChild(option.cloneNode(true));
+
+        assignSelects.forEach(select => {
+            select.appendChild(option.cloneNode(true));
+        });
+    });
+}
+
+window.addMember = async () => {
+    let newMemberName = prompt("Enter the name of the new member:");
+    if (newMemberName) {
+        // Add the new member to Firestore
+        await addDoc(collection(db, "members"), { name: newMemberName });
+		alert("New member added!");
+        loadMembers(); // Reload members from Firestore
+    }
+};
+
+
+window.restoreTicket = async (docId) => {
+    if (confirm("Are you sure you want to re-open this ticket?")) {
+        const ticketRef = doc(db, "tickets", docId);
+        await updateDoc(ticketRef, {
+            status: "New"
+        });
+        console.log("Ticket restored!");
+        loadTickets();  // Reload tickets to update display
+    }
+};
+
+
+
+
+function getAssignmentControl(docId, status) {
+    let members = Array.from(document.getElementById('memberSelect').options).map(option => option.value);
+    let optionsHTML = members.map(member => `<option value='${member}'>${member}</option>`).join('');
+
+    if (status === "New") {
+        return `<select id='assign-${docId}'>
+                    <option value=''>Assign Ticket</option>
+                    ${optionsHTML}
+                </select>
+                <br><button onclick='deleteTicket("${docId}")'>Delete</button> 
+                <button onclick='assignTicket("${docId}")'>Save</button> <br><br><br>`;
+    } else if (status === "Recently Deleted") {
+        // Only show a "Restore" button for recently deleted tickets
+        return `<button onclick='restoreTicket("${docId}")'>Restore</button><br><br>`;
+    } else {
+        // For all other statuses, provide a way to unassign or delete
+        return `<button onclick='unassignTicket("${docId}")'>Unassign</button>
+                <button onclick='deleteTicket("${docId}")'>Delete</button><br><br>`;
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+window.loadTickets = async () => {
+    console.log("Loading tickets...");
+    const openTicketsList = document.getElementById('openTicketsList');
+    const pendingTicketsList = document.getElementById('pendingTicketsList');
+    const deletedTicketsList = document.getElementById('deletedTicketsList');
+    const filter = document.getElementById('sortFilter').value;
+
+    // Clear the existing content
+    openTicketsList.innerHTML = '<h2></h2>';
+    pendingTicketsList.innerHTML = '<h2></h2>';
+    deletedTicketsList.innerHTML = '';  // Clear the deleted tickets list
+
+    const querySnapshot = await getDocs(collection(db, "tickets"));
+    console.log(`Number of tickets fetched: ${querySnapshot.size}`);
+
+    querySnapshot.forEach((doc) => {
+        const ticket = doc.data();
+        const ticketHTML = createTicketHTML(doc.id, ticket);
+
+        if (ticket.status === "Recently Deleted") {
+            deletedTicketsList.innerHTML += ticketHTML;
+        } else if (ticket.status === "New" && (filter === "all" || ticket.requestor === filter)) {
+            openTicketsList.innerHTML += ticketHTML;
+        } else if (filter === "all" || ticket.requestor === filter) {
+            pendingTicketsList.innerHTML += ticketHTML;
+        }
+    });
+};
+
+function createTicketHTML(docId, ticket) {
+    const createdAt = ticket.created.toDate();
+    const formattedCreationDate = createdAt.toLocaleDateString("en-US", { year: 'numeric', month: 'long', day: 'numeric' });
+    let ticketDetails = `<h2>${ticket.title}</h2>
+        <b>From:</b> ${ticket.requestor}
+        <p>${ticket.priority} Priority - Created: ${formattedCreationDate}</p>`;
+    
+    // Append the status, including deletion date if applicable
+    if (ticket.status === "Recently Deleted" && ticket.deletedAt) {
+        const deletedAt = ticket.deletedAt.toDate();
+        const formattedDeletionDate = deletedAt.toLocaleDateString("en-US", { year: 'numeric', month: 'long', day: 'numeric' });
+        ticketDetails += `<p>(Deleted on: ${formattedDeletionDate})</p>`;
+    } else {
+        ticketDetails += `<p>Status: ${ticket.status}</p>`;
+    }
+
+    let ticketHTML = `<div class='ticket-item' style='display: block;'>
+        ${ticketDetails}
+        <div id='ticketsinside'>${ticket.description}</div>
+        <br>${getAssignmentControl(docId, ticket.status)}
+    </div>`;
+
+    return ticketHTML;
+}
+
+
+
+
+
+        window.assignTicket = async (docId) => {
+            const selectedPerson = document.getElementById(`assign-${docId}`).value;
+            const ticketRef = doc(db, "tickets", docId);
+            if (selectedPerson !== '') {
+                await updateDoc(ticketRef, {
+                    status: `Assigned to ${selectedPerson}`
+                });
+                console.log("Ticket assigned!");
+                loadTickets();  // Reload tickets to update status
+            } else {
+                alert("Please select someone to assign the ticket.");
             }
-        }
+        };
 
-        function getCookie(name) {
-            const value = `; ${document.cookie}`;
-            const parts = value.split(`; ${name}=`);
-            if (parts.length === 2) return parts.pop().split(';').shift();
+        window.unassignTicket = async (docId) => {
+            const ticketRef = doc(db, "tickets", docId);
+            await updateDoc(ticketRef, {
+                status: "New"
+            });
+            console.log("Ticket unassigned!");
+            loadTickets();  // Reload tickets to reflect the change
+        };
+
+       
+
+        
+
+		
+		
+
+
+
+
+
+
+
+
+
+
+
+
+function setCookie(name, value, days) {
+    var expires = "";
+    if (days) {
+        var date = new Date();
+        date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+        expires = "; expires=" + date.toUTCString();
+    }
+    document.cookie = name + "=" + (value || "") + expires + "; path=/";
+    console.log("Cookie set: " + document.cookie); // Debugging
+}
+
+function getCookie(name) {
+    var nameEQ = name + "=";
+    var ca = document.cookie.split(';');
+    for (var i = 0; i < ca.length; i++) {
+        var c = ca[i].trim();
+        if (c.indexOf(nameEQ) === 0) return c.substring(nameEQ.length, c.length);
+    }
+    return null;
+}
+
+function checkPasswordEntry() {
+    if (!getCookie('passwordEntered')) {
+        let userPassword = prompt("Please enter your password:");
+        if (userPassword === 'alco0114') {
+            setCookie('passwordEntered', 'true', 1); // Set the cookie to expire in 1 day
+            alert("Correct password!");
+            location.reload(); // Reload the page to ensure the cookie is acknowledged
+        } else {
+            alert("Incorrect password. Please try again.");
+            checkPasswordEntry(); // Recursive call if incorrect
         }
+    } else {
+        console.log("Password entry already validated.");
+    }
+}
+
+window.onload = () => {
+    checkPasswordEntry();
+    console.log("Cookie value on load: " + getCookie('passwordEntered')); // Debugging
+    loadMembers();
+    loadTickets();
+};
+
+
+        
+        
     </script>
 </body>
 </html>

@@ -257,7 +257,7 @@ button {
         
         
         <button onclick="deleteMember()">Delete Member</button>
-		<br><br><br><br><br>
+		<br><br><br><br><br><br>
 </div>
 		</div>
 		
@@ -499,23 +499,16 @@ window.loadTickets = async () => {
     const filter = document.getElementById('sortFilter').value;
 
     // Clear the existing content
-    openTicketsList.innerHTML = '';
-    pendingTicketsList.innerHTML = '';
-    deletedTicketsList.innerHTML = '';
+    openTicketsList.innerHTML = '<h2></h2>';
+    pendingTicketsList.innerHTML = '<h2></h2>';
+    deletedTicketsList.innerHTML = '';  // Clear the deleted tickets list
 
-    const ticketsCollection = collection(db, "tickets");
-    const querySnapshot = await getDocs(ticketsCollection);
+    const querySnapshot = await getDocs(collection(db, "tickets"));
     console.log(`Number of tickets fetched: ${querySnapshot.size}`);
 
-    // Sort tickets based on priority
-    const tickets = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-    tickets.sort((a, b) => {
-        const priorityValues = { 'High': 3, 'Medium': 2, 'Low': 1 };
-        return priorityValues[b.priority] - priorityValues[a.priority];
-    });
-
-    tickets.forEach((ticket) => {
-        const ticketHTML = createTicketHTML(ticket.id, ticket);
+    querySnapshot.forEach((doc) => {
+        const ticket = doc.data();
+        const ticketHTML = createTicketHTML(doc.id, ticket);
 
         if (ticket.status === "Recently Deleted") {
             deletedTicketsList.innerHTML += ticketHTML;
@@ -526,7 +519,6 @@ window.loadTickets = async () => {
         }
     });
 };
-
 
 function createTicketHTML(docId, ticket) {
     const createdAt = ticket.created.toDate();
@@ -583,23 +575,66 @@ function createTicketHTML(docId, ticket) {
        
 
         
-window.onload = async () => {
-    await loadTickets(); // Load tickets when the page loads
-    await loadMembers(); // Load members from Firestore
-};
+
+		
+		
 
 
 
-		// Ensure that onload setup is in place
+
+
+
+
+
+
+
+
+
+function setCookie(name, value, days) {
+    var expires = "";
+    if (days) {
+        var date = new Date();
+        date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+        expires = "; expires=" + date.toUTCString();
+    }
+    document.cookie = name + "=" + (value || "") + expires + "; path=/";
+    console.log("Cookie set: " + document.cookie); // Debugging
+}
+
+function getCookie(name) {
+    var nameEQ = name + "=";
+    var ca = document.cookie.split(';');
+    for (var i = 0; i < ca.length; i++) {
+        var c = ca[i].trim();
+        if (c.indexOf(nameEQ) === 0) return c.substring(nameEQ.length, c.length);
+    }
+    return null;
+}
+
+function checkPasswordEntry() {
+    if (!getCookie('passwordEntered')) {
+        let userPassword = prompt("Please enter your password:");
+        if (userPassword === 'alco0114') {
+            setCookie('passwordEntered', 'true', 1); // Set the cookie to expire in 1 day
+            alert("Correct password!");
+            location.reload(); // Reload the page to ensure the cookie is acknowledged
+        } else {
+            alert("Incorrect password. Please try again.");
+            checkPasswordEntry(); // Recursive call if incorrect
+        }
+    } else {
+        console.log("Password entry already validated.");
+    }
+}
+
 window.onload = () => {
-loadMembers();
-    loadTickets(); // Initial load of tickets
-    let members = Array.from(document.getElementById('memberSelect').options).map(option => option.value);
-     
+    checkPasswordEntry();
+    console.log("Cookie value on load: " + getCookie('passwordEntered')); // Debugging
+    loadMembers();
+    loadTickets();
 };
 
 
-        //loadTickets();
         
         
     </script>
