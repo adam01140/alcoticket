@@ -499,16 +499,23 @@ window.loadTickets = async () => {
     const filter = document.getElementById('sortFilter').value;
 
     // Clear the existing content
-    openTicketsList.innerHTML = '<h2></h2>';
-    pendingTicketsList.innerHTML = '<h2></h2>';
-    deletedTicketsList.innerHTML = '';  // Clear the deleted tickets list
+    openTicketsList.innerHTML = '';
+    pendingTicketsList.innerHTML = '';
+    deletedTicketsList.innerHTML = '';
 
-    const querySnapshot = await getDocs(collection(db, "tickets"));
+    const ticketsCollection = collection(db, "tickets");
+    const querySnapshot = await getDocs(ticketsCollection);
     console.log(`Number of tickets fetched: ${querySnapshot.size}`);
 
-    querySnapshot.forEach((doc) => {
-        const ticket = doc.data();
-        const ticketHTML = createTicketHTML(doc.id, ticket);
+    // Sort tickets based on priority
+    const tickets = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    tickets.sort((a, b) => {
+        const priorityValues = { 'High': 3, 'Medium': 2, 'Low': 1 };
+        return priorityValues[b.priority] - priorityValues[a.priority];
+    });
+
+    tickets.forEach((ticket) => {
+        const ticketHTML = createTicketHTML(ticket.id, ticket);
 
         if (ticket.status === "Recently Deleted") {
             deletedTicketsList.innerHTML += ticketHTML;
@@ -519,6 +526,7 @@ window.loadTickets = async () => {
         }
     });
 };
+
 
 function createTicketHTML(docId, ticket) {
     const createdAt = ticket.created.toDate();
