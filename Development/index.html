@@ -98,6 +98,16 @@ button {
         height: 10%               /* Automatic height adjustment */
     }
 	
+	#desc {
+        border: 4px solid lightblue; /* Set the border color */
+        border-radius: 10px;        /* Rounded corners */
+        padding: 10px;              /* Some padding inside the border */
+        margin: 10px;               /* Margin outside the border */
+        background-color: #ffffff;  /* Light blue background */
+        width: 90%;               /* Fixed width */
+        height: 20%               /* Automatic height adjustment */
+    }
+	
 	
 
     #tickets {
@@ -150,6 +160,10 @@ button {
 </head>
 <body>
 <center>
+
+<div id="secret" style="display: none;">
+
+
     <!-- Ticket Submission Form -->
     <div id = "tickets">
         <h2><u>Submit a Ticket</u></h2>
@@ -157,7 +171,7 @@ button {
 		
 		<div id="ticketsinside">
 		<br><br>
-        <input type="text" id="ticketTitle" placeholder="Ticket Issue"><br>
+        <input type="text" id="ticketTitle" placeholder="Ticket Location"><br>
         <input type="text" id="ticketName" placeholder="Requester"><br>
         <textarea id="ticketDesc" placeholder="Description"></textarea><br>
         <select id="ticketPriority">
@@ -203,6 +217,9 @@ button {
 </div>
 <br>
 
+
+
+<br><br><br>
 <div id = "tickets">
 <!-- Pending Tickets -->
 
@@ -227,7 +244,7 @@ button {
 <br>
 	
 	<br>
-
+<br><br>
 <div id="memberManagement">
     <h2>Manage Members</h2>
 	
@@ -235,17 +252,9 @@ button {
 	
 	
 	<div id = "insidemembers">
-	<p><h3> Add a new member to the team </h3></p>
+	<p><h3> Add/Remove a new member to the team </h3></p>
 	<button onclick="addMember()"> Add New Member</button>
-	<br><br>
-	</div>
 	
-	
-	<br>
-    
-<div id = "insidemembers">
-
-<p><h3> Remove a member from the team </h3> </p>
 
         <div id="memberList">
 		
@@ -258,8 +267,18 @@ button {
         
         <button onclick="deleteMember()">Delete Member</button>
 		<br><br><br><br><br><br>
-</div>
+
 		</div>
+	
+	
+	</div>
+	
+	
+	<br>
+    
+
+
+
 		
     </div>
 	
@@ -270,7 +289,7 @@ button {
 
 
 
-<div id="deletedTicketsContainer">
+<div id="deletedTicketsContainer" style="display: none;">
     <h2>Recently Deleted Tickets</h2>
     <div id="deletedTicketsList" class="tickets-container"></div>
 </div>
@@ -280,7 +299,7 @@ button {
 
 
 
-
+</div>
     
 	</div>
 
@@ -390,6 +409,16 @@ window.loadMembers = async () => {
     // Update dropdowns
     updateMemberDropdowns(members);
 
+    // Update the `sortFilter` dropdown with members
+    const sortFilter = document.getElementById('sortFilter');
+    sortFilter.innerHTML = '<option value="all">All Tickets</option>'; // Reset the options
+    members.forEach(member => {
+        const option = document.createElement('option');
+        option.value = member;
+        option.text = member;
+        sortFilter.appendChild(option);
+    });
+
     // Check if the paragraph already exists
     let memberNamesPara = document.getElementById('memberNamesPara');
     if (!memberNamesPara) {
@@ -456,31 +485,59 @@ window.restoreTicket = async (docId) => {
 
 
 
-function getAssignmentControl(docId, status) {
+function getAssignmentControl(docId, status, description) {
     let members = Array.from(document.getElementById('memberSelect').options).map(option => option.value);
     let optionsHTML = members.map(member => `<option value='${member}'>${member}</option>`).join('');
 
-    if (status === "New") {
-        return `<select id='assign-${docId}'>
-                    <option value=''>Assign Ticket</option>
-                    ${optionsHTML}
-                </select>
-                <br><button onclick='deleteTicket("${docId}")'>Delete</button> 
-                <button onclick='assignTicket("${docId}")'>Save</button> <br><br><br>`;
+    let controlHTML = ``;
+	
+	 if (status === "New") {
+	controlHTML += `<select id='assign-${docId}'>
+                           <option value=''>Assign Ticket</option>
+                           ${optionsHTML}
+                       </select> 
+                       <button onclick='assignTicket("${docId}")'>Save</button><br>`;
+
+    // Include the description between the buttons
+   
+        controlHTML += `<br><textarea id="desc">${description}</textarea><br>
+                        
+						
+						<button onclick='deleteTicket("${docId}")'>Delete Ticket</button>`;
     } else if (status === "Recently Deleted") {
-        // Only show a "Restore" button for recently deleted tickets
-        return `<button onclick='restoreTicket("${docId}")'>Restore</button><br><br>`;
+        controlHTML += `<button onclick='restoreTicket("${docId}")'>Restore</button>`;
     } else {
-        // For all other statuses, provide a way to unassign or delete
-        return `<button onclick='unassignTicket("${docId}")'>Unassign</button>
-                <button onclick='deleteTicket("${docId}")'>Delete</button><br><br>`;
+        controlHTML += `<br><button onclick='unassignTicket("${docId}")'>Unassign</button>
+                        <button onclick='deleteTicket("${docId}")'>Delete</button>`;
     }
+
+    return controlHTML + "<br><br><br>"; // Ensure there is spacing after the last button
 }
 
 
+function createTicketHTML(docId, ticket) {
+    const createdAt = ticket.created.toDate();
+    const formattedCreationDate = createdAt.toLocaleDateString("en-US", {
+        year: 'numeric', month: 'long', day: 'numeric'
+    });
+    
+    // Check the status and adjust display text if necessary
+    let displayStatus = ticket.status;
+    if (ticket.status === "New") {
+        displayStatus = "Unassigned"; // Change from "New" to "Unassigned"
+    }
 
+    let ticketDetails = `
+        <div class='ticket-item' style='display: block;'>
+            <h2>${ticket.title}</h2>
+            <b>From:</b> ${ticket.requestor}
+            <p>${ticket.priority} Priority - Created: ${formattedCreationDate}</p>
+            <p>Status: ${displayStatus}</p> 
+            ${getAssignmentControl(docId, ticket.status, ticket.description)}
+        </div>`;
 
-
+    return ticketDetails;
+}
 
 
 
@@ -499,51 +556,37 @@ window.loadTickets = async () => {
     const filter = document.getElementById('sortFilter').value;
 
     // Clear the existing content
-    openTicketsList.innerHTML = '<h2></h2>';
-    pendingTicketsList.innerHTML = '<h2></h2>';
-    deletedTicketsList.innerHTML = '';  // Clear the deleted tickets list
+    openTicketsList.innerHTML = '';
+    pendingTicketsList.innerHTML = '';
+    deletedTicketsList.innerHTML = '';
 
-    const querySnapshot = await getDocs(collection(db, "tickets"));
+    const ticketsCollection = collection(db, "tickets");
+    const querySnapshot = await getDocs(ticketsCollection);
     console.log(`Number of tickets fetched: ${querySnapshot.size}`);
 
-    querySnapshot.forEach((doc) => {
-        const ticket = doc.data();
-        const ticketHTML = createTicketHTML(doc.id, ticket);
+    // Map priorities to values for sorting
+    const priorityValues = { 'High': 3, 'Medium': 2, 'Low': 1 };
+
+    // Convert documents into an array and sort by priority
+    const tickets = querySnapshot.docs
+        .map(doc => ({ id: doc.id, ...doc.data() }))
+        .sort((a, b) => priorityValues[b.priority] - priorityValues[a.priority]);  // Sorting by priority
+
+    tickets.forEach((ticket) => {
+        const ticketHTML = createTicketHTML(ticket.id, ticket);
 
         if (ticket.status === "Recently Deleted") {
             deletedTicketsList.innerHTML += ticketHTML;
-        } else if (ticket.status === "New" && (filter === "all" || ticket.requestor === filter)) {
+        } else if (ticket.status === "New") {
             openTicketsList.innerHTML += ticketHTML;
-        } else if (filter === "all" || ticket.requestor === filter) {
-            pendingTicketsList.innerHTML += ticketHTML;
+        } else if (ticket.status.startsWith("Assigned to")) {
+            const assignedPerson = ticket.status.split("Assigned to ")[1];
+            if (filter === 'all' || assignedPerson === filter) {
+                pendingTicketsList.innerHTML += ticketHTML;
+            }
         }
     });
 };
-
-function createTicketHTML(docId, ticket) {
-    const createdAt = ticket.created.toDate();
-    const formattedCreationDate = createdAt.toLocaleDateString("en-US", { year: 'numeric', month: 'long', day: 'numeric' });
-    let ticketDetails = `<h2>${ticket.title}</h2>
-        <b>From:</b> ${ticket.requestor}
-        <p>${ticket.priority} Priority - Created: ${formattedCreationDate}</p>`;
-    
-    // Append the status, including deletion date if applicable
-    if (ticket.status === "Recently Deleted" && ticket.deletedAt) {
-        const deletedAt = ticket.deletedAt.toDate();
-        const formattedDeletionDate = deletedAt.toLocaleDateString("en-US", { year: 'numeric', month: 'long', day: 'numeric' });
-        ticketDetails += `<p>(Deleted on: ${formattedDeletionDate})</p>`;
-    } else {
-        ticketDetails += `<p>Status: ${ticket.status}</p>`;
-    }
-
-    let ticketHTML = `<div class='ticket-item' style='display: block;'>
-        ${ticketDetails}
-        <div id='ticketsinside'>${ticket.description}</div>
-        <br>${getAssignmentControl(docId, ticket.status)}
-    </div>`;
-
-    return ticketHTML;
-}
 
 
 
@@ -590,53 +633,65 @@ function createTicketHTML(docId, ticket) {
 
 
 
-function setCookie(name, value, days) {
-    var expires = "";
-    if (days) {
-        var date = new Date();
-        date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
-        expires = "; expires=" + date.toUTCString();
-    }
-    document.cookie = name + "=" + (value || "") + expires + "; path=/";
-    console.log("Cookie set: " + document.cookie); // Debugging
-}
-
-function getCookie(name) {
-    var nameEQ = name + "=";
-    var ca = document.cookie.split(';');
-    for (var i = 0; i < ca.length; i++) {
-        var c = ca[i].trim();
-        if (c.indexOf(nameEQ) === 0) return c.substring(nameEQ.length, c.length);
-    }
-    return null;
-}
-
-function checkPasswordEntry() {
-    if (!getCookie('passwordEntered')) {
-        let userPassword = prompt("Please enter your password:");
-        if (userPassword === 'alco0114') {
-            setCookie('passwordEntered', 'true', 1); // Set the cookie to expire in 1 day
-            alert("Correct password!");
-            location.reload(); // Reload the page to ensure the cookie is acknowledged
-        } else {
-            alert("Incorrect password. Please try again.");
-            checkPasswordEntry(); // Recursive call if incorrect
-        }
-    } else {
-        console.log("Password entry already validated.");
-    }
-}
 
 window.onload = () => {
-    checkPasswordEntry();
-    console.log("Cookie value on load: " + getCookie('passwordEntered')); // Debugging
-    loadMembers();
-    loadTickets();
+
+   
+        loadMembers();
+        loadTickets();
+    
 };
+
 
 
         
         
     </script>
+	
+	
+	
+	<script>
+    function setCookie(name, value, seconds) {
+        var expires = "";
+        if (seconds) {
+            var date = new Date();
+            date.setTime(date.getTime() + (seconds * 100000));
+            expires = "; expires=" + date.toUTCString();
+        }
+        document.cookie = name + "=" + (value || "") + expires + "; path=/";
+    }
+
+    function getCookie(name) {
+        var nameEQ = name + "=";
+        var ca = document.cookie.split(';');
+        for(var i=0; i < ca.length; i++) {
+            var c = ca[i];
+            while (c.charAt(0)==' ') c = c.substring(1);
+            if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length,c.length);
+        }
+        return null;
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const accessTime = getCookie('access_time');
+        if (accessTime) {
+            const ageInSeconds = (new Date() - new Date(accessTime)) / 1000;
+            if (ageInSeconds < 60) {
+                document.getElementById('secret').style.display = 'block';
+                return;
+            }
+        }
+
+        let password = prompt("Please enter the password to access this page:");
+        if (password === "Scada0114") {
+            document.getElementById('secret').style.display = 'block';
+            setCookie('access_time', new Date().toISOString(), 60);
+        } else {
+            alert("Incorrect password. You cannot access this page.");
+        }
+    });
+    </script>
+	
+	
 </body>
 </html>
