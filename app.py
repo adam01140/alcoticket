@@ -113,7 +113,7 @@ def get_html_content():
         padding: 20px;              /* Some padding inside the border */
         margin: 10px;               /* Margin outside the border */
         background-color: #ffffff;  /* Light blue background */
-        width: 80%;               /* Fixed width */
+        width: 100%;               /* Fixed width */
         height: 100% 
 }
    
@@ -127,7 +127,7 @@ def get_html_content():
         padding: 20px;              /* Some padding inside the border */
         margin: 10px;               /* Margin outside the border */
         background-color: #ffffff;  /* Light blue background */
-        width: 80%;               /* Fixed width */
+        width: 100%;               /* Fixed width */
         height: 100% 
 }
 
@@ -197,7 +197,7 @@ button {
         padding: 20px;              /* Some padding inside the border */
         margin: 10px;               /* Margin outside the border */
         background-color: #ffffff;  /* Light blue background */
-        width: 80%;               /* Fixed width */
+        width: 100%;               /* Fixed width */
         height: 100%               /* Automatic height adjustment */
     }
 
