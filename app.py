@@ -676,7 +676,10 @@ loadMembers();
     let members = Array.from(document.getElementById('memberSelect').options).map(option => option.value);
      
 };
-
+loadMembers();
+    loadTickets(); // Initial load of tickets
+    let members = Array.from(document.getElementById('memberSelect').options).map(option => option.value);
+     
 
         //loadTickets();
         
